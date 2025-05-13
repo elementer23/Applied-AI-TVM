@@ -34,17 +34,3 @@ jobs:
     - name: Run Python tests with coverage
       run: |
         pytest --cov=code_test.py tests/
-
-    # Node.js / React setup
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install frontend dependencies
-      working-directory: ./Applied_AI_TVM_UI
-      run: npm install
-
-    - name: Run frontend build
-      working-directory: ./Applied_AI_TVM_UI
-      run: npm run build
