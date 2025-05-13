@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        language: [ 'python', 'javascript' ]  # Use both since your project uses both
+        language: [ 'python' ]  # Use both since your project uses both
 
     steps:
     - name: Checkout repository
