@@ -27,17 +27,15 @@ crewai install
 - Modify `src/tvm/crew.py` to add your own logic, tools and specific args
 - Modify `src/tvm/main.py` to add custom inputs for your agents and tasks
 
-## Running the Project
+## Running the Project with FastAPI
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+To kickstart your crew of AI agents and begin task execution, run this from the src/tvm folder of your project:
 
 ```bash
-$ crewai run
+$ uvicorn main:app
 ```
 
-This command initializes the TVM Crew, assembling the agents and assigning them tasks as defined in your configuration.
-
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+This command will start the FastAPI instance and will run the agent when the endpoint is used.
 
 ## Understanding Your Crew
 

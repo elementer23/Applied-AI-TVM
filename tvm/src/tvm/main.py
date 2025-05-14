@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import sys
 import warnings
+import json
+from fastapi import FastAPI
 
 from datetime import datetime
 
@@ -13,6 +15,9 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 # Replace with inputs you want to test with, it will automatically
 # interpolate any tasks and agents information
 
+app = FastAPI()
+
+@app.get("/test")
 def run():
     """
     Run the crew.
@@ -23,9 +28,11 @@ def run():
     }
     
     try:
-        Tvm().crew().kickoff(inputs=inputs)
+        result = Tvm().crew().kickoff(inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
+
+    return {"output":result.raw}
 
 
 def train():
