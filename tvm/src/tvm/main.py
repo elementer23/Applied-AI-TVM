@@ -23,12 +23,15 @@ def run():
     Run the crew.
     """
     inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
+        'basis_verzekerd_bedrag': '100.000',
+        'eigen_risico': '5000',
+        'advies_opgevolgd': 'Nee',
+        'reden_niet_opvolgen': 'Voldoende eigen vermogen'
     }
     
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
+        #result = Tvm().crew().kickoff()
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
