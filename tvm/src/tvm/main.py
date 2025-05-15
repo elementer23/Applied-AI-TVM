@@ -3,6 +3,7 @@ import sys
 import warnings
 import json
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 from datetime import datetime
 
@@ -17,16 +18,16 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
-@app.get("/test")
-def run():
+class InputData(BaseModel):
+    input: str
+
+@app.post("/run")
+def run(data: InputData):
     """
     Run the crew.
     """
     inputs = {
-        'basis_verzekerd_bedrag': '100.000',
-        'eigen_risico': '5000',
-        'advies_opgevolgd': 'Nee',
-        'reden_niet_opvolgen': 'Voldoende eigen vermogen'
+        'input': data.input,
     }
     
     try:

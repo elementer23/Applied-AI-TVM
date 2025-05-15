@@ -15,7 +15,7 @@ rewrite_task_minrisk:
 
 research:
   description: >
-    Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {basis_verzekerd_bedrag} {eigen_risico} {advies_opgevolgd} en {reden_niet_opvolgen}
+    Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
   expected_output: >
     Eigen risico
     Verzekerd bedrag
