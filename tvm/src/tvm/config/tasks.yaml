@@ -1,16 +1,24 @@
-research_task:
+rewrite_task_minrisk:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input the halen en de blokhaken te vervangen met de data.
+    
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om alle trekkers + opleggers WA volledig casco te verzekeren. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
+    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' en voeg je direct de volgende waarschuwingsclausule toe: 'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-  agent: reporting_analyst
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
+
+research:
+  description: >
+    Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
+  expected_output: >
+    Eigen risico
+    Verzekerd bedrag
+    Advies wordt opgevolgd
+    Reden dat advies niet wordt opgevolgd indien van toepassing
+  agent: reader

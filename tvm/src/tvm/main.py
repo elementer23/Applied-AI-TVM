@@ -3,6 +3,7 @@ import sys
 import warnings
 import json
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 from datetime import datetime
 
@@ -17,18 +18,21 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
-@app.get("/test")
-def run():
+class InputData(BaseModel):
+    input: str
+
+@app.post("/run")
+def run(data: InputData):
     """
     Run the crew.
     """
     inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
+        'input': data.input,
     }
     
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
+        #result = Tvm().crew().kickoff()
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
