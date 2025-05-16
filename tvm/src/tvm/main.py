@@ -7,6 +7,9 @@ from pydantic import BaseModel
 
 from datetime import datetime
 
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
+
 from tvm.crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
@@ -18,7 +21,20 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+)
+
 class InputData(BaseModel):
+    input: str
+
+class Message(BaseModel):
     input: str
 
 @app.post("/run")
@@ -29,14 +45,14 @@ def run(data: InputData):
     inputs = {
         'input': data.input,
     }
-    
+
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
-        #result = Tvm().crew().kickoff()
+        # result = Tvm().crew().kickoff()
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
-    return {"output":result.raw}
+    return {"output": result.raw}
 
 
 def train():
@@ -77,3 +93,28 @@ def test():
 
     except Exception as e:
         raise Exception(f"An error occurred while testing the crew: {e}")
+
+@app.post("/test2")
+def test2(message: InputData):
+    """
+    Testing the post capabilities and response
+    """
+    response_content = {
+        "test": message.input,
+        "answer": "it works"
+    }
+
+    return JSONResponse(content=response_content, status_code=200)
+
+
+@app.post("/retrieve")
+def retrieve(message: InputData):
+    """
+    test retrieval
+    """
+    response_content = {
+        "question": message.input,
+        "answer": "lets see if it works"
+    }
+
+    return JSONResponse(content=response_content, status_code=200)
