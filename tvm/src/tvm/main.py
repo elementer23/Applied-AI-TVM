@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import warnings
-import json
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -21,13 +21,9 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=os.getenv("ORIGINS_CALL"),
     allow_methods=["*"],
 )
 
