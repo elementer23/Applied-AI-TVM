@@ -89,28 +89,3 @@ def test():
 
     except Exception as e:
         raise Exception(f"An error occurred while testing the crew: {e}")
-
-@app.post("/test2")
-def test2(message: InputData):
-    """
-    Testing the post capabilities and response
-    """
-    response_content = {
-        "test": message.input,
-        "answer": "it works"
-    }
-
-    return JSONResponse(content=response_content, status_code=200)
-
-
-@app.post("/retrieve")
-def retrieve(message: InputData):
-    """
-    test retrieval
-    """
-    response_content = {
-        "question": message.input,
-        "answer": "lets see if it works"
-    }
-
-    return JSONResponse(content=response_content, status_code=200)
