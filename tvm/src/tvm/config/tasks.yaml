@@ -13,11 +13,29 @@ rewrite_task_minrisk:
   agent: writer
 
 
-rewrite_task_risk_in_euros:
+rewrite_task_risk_in_euros_damage_to_third_parties:
   description: >
     Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
     
     Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van (limiet_in_euros) wilt en kunt dragen. Mijn advies is om (onderdelen_te_verzekeren) te verzekeren. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico)/standaard eigen risico. Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op)'
+    
+    Als (volgt_advies_op) waar is, vul je in: 'mijn advies opvolgt.'
+    Als (volgt_advies_op) niet waar is, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
+    
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
+
+rewrite_task_risk_in_euros_damage_by_standstill:
+  description: >
+    Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
+    
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van 10.000 wilt en kunt dragen. Mijn advies is om (sluit_bedrijfskosten_dekking_af). Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico)/standaard eigen risico. Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op)'
+    
+    Als (sluit_bedrijfskosten_dekking_af) waar is, vul je in 'een extra bedrijfskosten dekking af te sluiten.'
+    Als (sluit_bedrijfskosten_dekking_af) niet waar is, vul je in 'geen extra bedrijfskosten dekking af te sluiten.'
     
     Als (volgt_advies_op) waar is, vul je in: 'mijn advies opvolgt.'
     Als (volgt_advies_op) niet waar is, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
