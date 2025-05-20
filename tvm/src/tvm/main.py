@@ -29,7 +29,7 @@ app.add_middleware(
 
 class InputData(BaseModel):
     input: str
-    
+
 @app.post("/run")
 def run(data: InputData):
     """

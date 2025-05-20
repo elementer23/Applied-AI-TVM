@@ -61,13 +61,6 @@ class Tvm():
         )
 
     @task
-    def research_task_standstill_minrisk(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task_standstill_minrisk'],
-            # type: ignore[index]
-        )
-
-    @task
     def rewrite_task_standstill_minrisk(self) -> Task:
         return Task(
             config=self.tasks_config['rewrite_task_standstill_minrisk'],
