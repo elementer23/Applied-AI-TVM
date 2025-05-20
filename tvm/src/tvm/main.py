@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 import sys
 import warnings
-import json
 from fastapi import FastAPI
 from pydantic import BaseModel
-
-from datetime import datetime
 
 from tvm.crew import Tvm
 
@@ -18,11 +15,13 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
+from authentication import *
+
 class InputData(BaseModel):
     input: str
 
 @app.post("/run")
-def run(data: InputData):
+def run(data: InputData, current_user: User = Depends(get_current_user)):
     """
     Run the crew.
     """
