@@ -20,6 +20,14 @@ class Tvm():
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
 
+    # dont include manager in agent list
+    def manager(self) -> Agent:
+        return Agent(
+            config=self.agents_config['manager'],  # type: ignore[index]
+            verbose=True,
+            allow_delegation=True,
+        )
+
     @agent
     def reader(self) -> Agent:
         return Agent(
@@ -66,6 +74,13 @@ class Tvm():
             # type: ignore[index]
         )
 
+    @task
+    def rewrite_task_eigenrisico(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_eigenrisico'],
+            # type: ignore[index]
+        )
+
     @crew
     def crew(self) -> Crew:
         """Creates the Tvm crew"""
@@ -75,8 +90,9 @@ class Tvm():
         return Crew(
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
-            process=Process.sequential,
+            process=Process.hierarchical,
             verbose=True,
+            manager_agent=self.manager(),
 
             # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
