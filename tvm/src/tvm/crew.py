@@ -52,6 +52,12 @@ class Tvm():
             # type: ignore[index]
         )
 
+    @task
+    def rewrite_task_customer_declines_advice(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_customer_declines_advice'],
+        )
+
     @crew
     def crew(self) -> Crew:
         """Creates the Tvm crew"""

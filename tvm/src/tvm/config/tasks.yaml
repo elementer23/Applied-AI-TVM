@@ -80,6 +80,18 @@ rewrite_task_risk_in_euros_damage_to_passengers:
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
 
+  rewrite_task_customer_declines_advice:
+    description: >
+      Deze tekst wordt gebruikt wanneer de klant heeft aangegeven géén advies te willen ontvangen. stel alsnog een korte standaardtekst op waarmee het tekstpad op een correcte manier wordt afgesloten.
+
+      Gebruik deze standaardtekst: 
+      Tijdens de inventarisatie heeft u aangegeven geen behoefte te hebben aan een advies. Wij respecteren uw keuze. Houd er echter rekening mee dat het ontbreken van een passend verzekeringsadvies risico’s met zich mee kan brengen. Indien u op een later moment alsnog advies wenst, staan wij uiteraard voor u klaar.'
+
+      Het eindresultaat moet een grammaticaal correcte, zakelijke afsluiting zijn in het Nederlands. Voeg geen extra informatie toe.
+
+    expected_output: >
+      Een korte, afsluitende standaardtekst in het Nederlands.
+    agent: writer
 
 research:
   description: >
