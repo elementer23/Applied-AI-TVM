@@ -3,6 +3,14 @@ import sys
 import warnings
 from fastapi import FastAPI
 from pydantic import BaseModel
+import os
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from datetime import datetime
+
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 
 from tvm.crew import Tvm
 
@@ -17,6 +25,12 @@ app = FastAPI()
 
 from authentication import *
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("ORIGINS_CALL"),
+    allow_methods=["*"],
+)
+
 class InputData(BaseModel):
     input: str
 
@@ -28,14 +42,14 @@ def run(data: InputData, current_user: User = Depends(get_current_user)):
     inputs = {
         'input': data.input,
     }
-    
+
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
-        #result = Tvm().crew().kickoff()
+        # result = Tvm().crew().kickoff()
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
-    return {"output":result.raw}
+    return {"output": result.raw}
 
 
 def train():
