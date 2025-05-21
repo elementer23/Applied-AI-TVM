@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import sys
 import warnings
+from fastapi import FastAPI
+from pydantic import BaseModel
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -21,6 +23,8 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
+from authentication import *
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ORIGINS_CALL"),
@@ -31,7 +35,7 @@ class InputData(BaseModel):
     input: str
 
 @app.post("/run")
-def run(data: InputData):
+def run(data: InputData, current_user: User = Depends(get_current_user)):
     """
     Run the crew.
     """
