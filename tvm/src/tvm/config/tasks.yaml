@@ -24,6 +24,22 @@ research:
     Reden dat advies niet wordt opgevolgd indien van toepassing
   agent: reader
 
+
+rewrite_task_standstill_minrisk:
+  description: >
+    Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken en het gaat over schade door stilstand. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input the halen en de blokhaken te vervangen met de data.
+
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
+
+    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
+    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' en voeg je direct de volgende waarschuwingsclausule toe: 'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
+
 rewrite_task_eigenrisico:
   description: >
     Deze tekst wordt gebruikt wanneer de klant een eigen risico van een bepaald bedrag wenst. Stel de tekst op door informatie uit de input te gebruiken in de onderstaande standaardtekst. De informatie die ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input te halen en vervang de haken met de juiste gegevens.
@@ -40,3 +56,5 @@ rewrite_task_eigenrisico:
   expected_output: >
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
+
+

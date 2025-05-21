@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import sys
 import warnings
-import json
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 from datetime import datetime
+
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 
 from tvm.crew import Tvm
 
@@ -18,6 +21,12 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("ORIGINS_CALL"),
+    allow_methods=["*"],
+)
+
 class InputData(BaseModel):
     input: str
 
@@ -29,14 +38,14 @@ def run(data: InputData):
     inputs = {
         'input': data.input,
     }
-    
+
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
-        #result = Tvm().crew().kickoff()
+        # result = Tvm().crew().kickoff()
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
-    return {"output":result.raw}
+    return {"output": result.raw}
 
 
 def train():
