@@ -129,6 +129,22 @@ rewrite_task_identify_by_risk_damage_by_standstill:
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
 
+rewrite_task_deviate_from_identification_damage_by_standstill:
+  description: >
+    Deze tekst wordt gebruikt wanneer de klant aangeeft een hogere risicobereidheid te hebben dan uit de inventarisatie is gebleken en het gaat om schade door stilstand. Stel de tekst op door informatie uit de input te gebruiken in de onderstaande standaardtekst. De informatie die ingevuld moet worden staat tussen haken. Vervang de haken met data uit de input.
+    
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'U geeft aan dat u op dit onderdeel bereid bent meer risico te lopen dan wij samen hebben vastgesteld tijdens de inventarisatie. U geeft aan dat uw risicobereidheid op dit onderdeel (risicobereidheid_omschrijving) is. Dit kunt en wilt u dragen. Mijn advies is om (sluit_bedrijfskosten_dekking_af). Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico)/standaard eigen risico. Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op)'
+
+    Als (sluit_bedrijfskosten_dekking_af) waar is, vul je in: 'een extra bedrijfskosten dekking af te sluiten.'
+    Als (sluit_bedrijfskosten_dekking_af) niet waar is, vul je in: 'geen extra bedrijfskosten dekking af te sluiten.'
+
+    Als (volgt_advies_op) waar is, vul je in: 'mijn advies opvolgt.'
+    Als (volgt_advies_op) niet waar is, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, waarin de verzamelde input correct verwerkt is en waarin de conditionele logica juist is toegepast.
+  agent: writer
 
 rewrite_task_identify_by_risk_loss_of_personal_items:
   description: >
