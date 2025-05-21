@@ -12,7 +12,7 @@ from datetime import datetime
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from tvm.crew import Tvm
+from crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
