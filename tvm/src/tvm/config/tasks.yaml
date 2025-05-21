@@ -112,6 +112,24 @@ rewrite_task_identify_by_risk_damage_to_third_parties:
   agent: writer
 
 
+rewrite_task_identify_by_risk_damage_by_standstill:
+  description: >
+    Deze tekst wordt altijd gebruikt wanneer de klant wenst geadviseerd te worden op basis van de risicobereidheid in euro's en het gaat om schade door stilstand. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input the halen en de haken te vervangen met de data.
+    
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat wij per risico in kaart brengen hoeveel risico u wilt en kunt dragen. U heeft aangegeven dat uw verzekeringsbeleid is om (omschrijving_verzekeringsbeleid). U geeft aan dat u dit kunt en wilt dragen. Mijn advies is om (sluit_bedrijfskosten_dekking_af). Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico)/standaard eigen risico. Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op)'
+    
+    Als (sluit_bedrijfskosten_dekking_af) waar is, vul je in 'een extra bedrijfskosten dekking af te sluiten.'
+    Als (sluit_bedrijfskosten_dekking_af) niet waar is, vul je in 'geen extra bedrijfskosten dekking af te sluiten.'
+    
+    Als (volgt_advies_op) waar is, vul je in: 'mijn advies opvolgt.'
+    Als (volgt_advies_op) niet waar is, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
+    
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
+
 research:
   description: >
     Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
