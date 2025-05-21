@@ -49,24 +49,22 @@ class Tvm():
     @task
     def research(self) -> Task:
         return Task(
-            config=self.tasks_config['research'],
-            # type: ignore[index]
+            config=self.tasks_config['research'], # type: ignore[index]
         )
 
 
     @task
     def rewrite_task_minrisk(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_minrisk'],
-            # type: ignore[index]
+            config=self.tasks_config['rewrite_task_minrisk'], # type: ignore[index]
         )
 
     @task
     def rewrite_task_eigenrisico(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_eigenrisico'],
-            # type: ignore[index]
+            config=self.tasks_config['rewrite_task_eigenrisico'], # type: ignore[index]
         )
+
 
     @crew
     def crew(self) -> Crew:

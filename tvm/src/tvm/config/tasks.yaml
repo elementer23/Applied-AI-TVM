@@ -40,3 +40,17 @@ rewrite_task_eigenrisico:
   expected_output: >
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
+
+#analyze_old_forms:
+#  description: >
+#    Analyzeer oude teksten (dit is {input}) om relevante informatie op te halen per schade catagorie. De catagorien zijn als volgt:
+#    1. Schade aan derden of schade aan eigen voertuig door bijvoorbeeld diefstal, brand en/of storm of schade door eigen toedoen
+#    2. Schade door stilstand
+#    3. Verlies van persoonlijke goederen van chauffeur
+#    4. (Letsel)schade passagiers
+#  expected_output: >
+#    Er wordt verwacht om per catagorie de volgende parameters te leveren:
+#    basis_verzekerd_bedrag is de standaaard verzekerde waarde.
+#    eigen_risico is het eigen risico dat hierbij hoort.
+#    Indien een catagorie geen data heeft, MOET dit worden aangegeven.
+#  agent: analyzer
