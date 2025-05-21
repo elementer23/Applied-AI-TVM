@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 import sys
 import warnings
-from fastapi import FastAPI
-from pydantic import BaseModel
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
-
 from datetime import datetime
 
 from starlette.middleware.cors import CORSMiddleware

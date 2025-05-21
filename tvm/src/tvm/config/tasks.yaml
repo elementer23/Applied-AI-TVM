@@ -17,11 +17,13 @@ research:
   description: >
     Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
   expected_output: >
+    Inventaris
     Risico tot minimum beperken of niet
     Eigen risico
     Verzekerd bedrag
     Advies wordt opgevolgd
     Reden dat advies niet wordt opgevolgd indien van toepassing
+    Overige context
   agent: reader
 
 
