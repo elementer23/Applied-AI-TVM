@@ -87,6 +87,17 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return current_user
 
+
+def verify_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=403, detail="Token is invalid or expired.")
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Token is invalid or expired.")
+
 from main import app
 
 @app.post("/token")
@@ -115,3 +126,9 @@ def create_user(username: str, password: str, role: str = "user", db: Session = 
 @app.get("/me")
 def read_users_me(current_user: User = Depends(get_current_user)):
     return {"username": current_user.username, "role": current_user.role}
+
+
+@app.get("/verify-token/{token}")
+async def verify_user_token(token: str):
+    verify_token(token=token)
+    return { "message": "Token is valid"}
