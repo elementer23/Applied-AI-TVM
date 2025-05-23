@@ -7,7 +7,6 @@
     <list default="true" id="5c10202a-11dd-4b11-9c68-8558bd5179bc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/tvm/config/tasks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/tvm/config/tasks.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tvm/crew.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tvm/crew.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +68,7 @@
       <workItem from="1747923022789" duration="10000" />
       <workItem from="1747983708693" duration="920000" />
       <workItem from="1747986589775" duration="3203000" />
-      <workItem from="1747995505382" duration="972000" />
+      <workItem from="1747995505382" duration="2002000" />
     </task>
     <servers />
   </component>

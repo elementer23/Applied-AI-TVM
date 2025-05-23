@@ -127,7 +127,7 @@ rewrite_task_identify_by_risk_damage_by_standstill:
 
 rewrite_task_minrisk_loss_of_personal_items:
   description: >
-    Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
+    Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken en het gaat over verlies van persoonlijke goederen van de chauffeur. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
 
     Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een diefstal bagage dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op).'
 
@@ -266,7 +266,7 @@ rewrite_task_identify_by_risk_damage_to_passengers:
 
 rewrite_task_customer_declines_advice:
   description: >
-    Deze tekst wordt gebruikt wanneer de klant heeft aangegeven géén advies te willen ontvangen. stel alsnog een korte standaardtekst op waarmee het tekstpad op een correcte manier wordt afgesloten.
+    Deze tekst wordt gebruikt wanneer de klant heeft aangegeven géén advies te willen ontvangen. Dit moet expliciet in de informatie in de input staan om deze tekst te gebruiken. stel alsnog een korte standaardtekst op waarmee het tekstpad op een correcte manier wordt afgesloten.
 
     Gebruik deze standaardtekst: 
     Tijdens de inventarisatie heeft u aangegeven geen behoefte te hebben aan een advies. Wij respecteren uw keuze. Houd er echter rekening mee dat het ontbreken van een passend verzekeringsadvies risico’s met zich mee kan brengen. Indien u op een later moment alsnog advies wenst, staan wij uiteraard voor u klaar.'
