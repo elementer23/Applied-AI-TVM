@@ -56,6 +56,7 @@ rewrite_task_identify_by_risk_damage_to_third_parties:
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
 
+
 rewrite_task_minrisk_damage_by_standstill:
   description: >
     Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken en het gaat over schade door stilstand. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input the halen en de blokhaken te vervangen met de data.
@@ -196,7 +197,7 @@ rewrite_task_identify_by_risk_loss_of_personal_items:
 
 rewrite_task_minrisk_damage_to_passengers:
   description: >
-    Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
+    Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken en het gaat over (letsel)schade passagiers. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
 
     Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een SVI dekking af te sluiten. Voor het verzekerde bedrag en het eigen risico van verwijs ik u naar de polis. U geeft aan dat u (volgt_advies_op).'
 
