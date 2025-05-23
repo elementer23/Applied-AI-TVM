@@ -53,9 +53,9 @@ class Tvm():
         )
 
     @task
-    def rewrite_task_thirdparty_minrisk(self) -> Task:
+    def rewrite_task_minrisk_damage_to_third_parties(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_thirdparty_minrisk'],
+            config=self.tasks_config['rewrite_task_minrisk_damage_to_third_parties'],
             # type: ignore[index]
         )
 
@@ -88,9 +88,9 @@ class Tvm():
         )
 
     @task
-    def rewrite_task_standstill_minrisk(self) -> Task:
+    def rewrite_task_minrisk_damage_by_standstill(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_standstill_minrisk'],
+            config=self.tasks_config['rewrite_task_minrisk_damage_by_standstill'],
             # type: ignore[index]
         )
 

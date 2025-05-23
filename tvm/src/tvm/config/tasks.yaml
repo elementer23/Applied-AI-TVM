@@ -1,16 +1,13 @@
-rewrite_task_thirdparty_minrisk:
+rewrite_task_minrisk_damage_to_third_parties:
   description: >
     Deze tekst wordt gebruikt wanneer de klant aangeeft alle risico's tot een minimum te willen beperken en het risicogebied schade aan derden of door eigen toedoen betreft. Gebruik informatie uit de input om onderstaande standaardtekst aan te vullen. Gegevens die ingevuld moeten worden staan tussen haakjes. Probeer alle vereiste data uit de input te halen en vervang de haakjes met de bijbehorende informatie.
 
-    Gebruik deze standaardtekst:  
-    'Tijdens onze beoordeling hebben wij vastgesteld dat u het risico op schade aan derden of door eigen toedoen tot een minimum wilt beperken. Mijn advies is om een aanvullende aansprakelijkheidsverzekering af te sluiten, afgestemd op het risico in uw specifieke situatie. Op basis van het verzekerde bedrag van € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico) zoals vermeld op uw polis, adviseer ik (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om alle trekkers + opleggers WA volledig casco te verzekeren. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico)/standaard eigen risico. Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op)'
 
-    Als het advies wordt opgevolgd, vul je in: 'om mijn advies op te volgen.'
-
-    Als het advies niet wordt opgevolgd, vul je in: 'om mijn advies niet op te volgen, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:  
-    'Wij wijzen u erop dat het afwijken van dit advies serieuze gevolgen kan hebben voor uw aansprakelijkheidspositie. In sommige gevallen kan dit leiden tot hoge schadeclaims waarvoor u zelf verantwoordelijk bent. U bent zich hiervan bewust en accepteert dit risico.'
-
-    Het eindresultaat moet een vloeiende, grammaticaal correcte Nederlandse alinea zijn.
+    Als (volgt_advies_op) waar is, vul je in: 'mijn advies opvolgt.'
+    Als (volgt_advies_op) niet waar is, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
+    
+    Het eindresultaat moet een coherente, grammaticaal correcte Nederlandse alinea zijn.
   expected_output: >
     De output is een volledig samengestelde alinea in het Nederlands, waarin alle relevante inputgegevens correct zijn verwerkt en waarbij logica op basis van adviesopvolging wordt toegepast.
   agent: writer
@@ -59,15 +56,15 @@ rewrite_task_identify_by_risk_damage_to_third_parties:
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
 
-rewrite_task_standstill_minrisk:
+rewrite_task_minrisk_damage_by_standstill:
   description: >
     Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken en het gaat over schade door stilstand. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input the halen en de blokhaken te vervangen met de data.
 
-    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (volgt_advies_op)'
 
-    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
-    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' en voeg je direct de volgende waarschuwingsclausule toe: 'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
-
+    Als (volgt_advies_op) waar is, vul je in: 'mijn advies opvolgt.'
+    Als (volgt_advies_op) niet waar is, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
+    
     Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
   expected_output: >
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
