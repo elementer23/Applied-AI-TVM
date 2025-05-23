@@ -1,19 +1,19 @@
-  rewrite_task_thirdparty_minrisk:
-    description: >
-      Deze tekst wordt gebruikt wanneer de klant aangeeft alle risico's tot een minimum te willen beperken en het risicogebied schade aan derden of door eigen toedoen betreft. Gebruik informatie uit de input om onderstaande standaardtekst aan te vullen. Gegevens die ingevuld moeten worden staan tussen haakjes. Probeer alle vereiste data uit de input te halen en vervang de haakjes met de bijbehorende informatie.
+rewrite_task_thirdparty_minrisk:
+  description: >
+    Deze tekst wordt gebruikt wanneer de klant aangeeft alle risico's tot een minimum te willen beperken en het risicogebied schade aan derden of door eigen toedoen betreft. Gebruik informatie uit de input om onderstaande standaardtekst aan te vullen. Gegevens die ingevuld moeten worden staan tussen haakjes. Probeer alle vereiste data uit de input te halen en vervang de haakjes met de bijbehorende informatie.
 
-      Gebruik deze standaardtekst:  
-      'Tijdens onze beoordeling hebben wij vastgesteld dat u het risico op schade aan derden of door eigen toedoen tot een minimum wilt beperken. Mijn advies is om een aanvullende aansprakelijkheidsverzekering af te sluiten, afgestemd op het risico in uw specifieke situatie. Op basis van het verzekerde bedrag van € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico) zoals vermeld op uw polis, adviseer ik (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
+    Gebruik deze standaardtekst:  
+    'Tijdens onze beoordeling hebben wij vastgesteld dat u het risico op schade aan derden of door eigen toedoen tot een minimum wilt beperken. Mijn advies is om een aanvullende aansprakelijkheidsverzekering af te sluiten, afgestemd op het risico in uw specifieke situatie. Op basis van het verzekerde bedrag van € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico) zoals vermeld op uw polis, adviseer ik (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
 
-      Als het advies wordt opgevolgd, vul je in: 'om mijn advies op te volgen.'
+    Als het advies wordt opgevolgd, vul je in: 'om mijn advies op te volgen.'
 
-      Als het advies niet wordt opgevolgd, vul je in: 'om mijn advies niet op te volgen, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:  
-      'Wij wijzen u erop dat het afwijken van dit advies serieuze gevolgen kan hebben voor uw aansprakelijkheidspositie. In sommige gevallen kan dit leiden tot hoge schadeclaims waarvoor u zelf verantwoordelijk bent. U bent zich hiervan bewust en accepteert dit risico.'
+    Als het advies niet wordt opgevolgd, vul je in: 'om mijn advies niet op te volgen, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:  
+    'Wij wijzen u erop dat het afwijken van dit advies serieuze gevolgen kan hebben voor uw aansprakelijkheidspositie. In sommige gevallen kan dit leiden tot hoge schadeclaims waarvoor u zelf verantwoordelijk bent. U bent zich hiervan bewust en accepteert dit risico.'
 
-      Het eindresultaat moet een vloeiende, grammaticaal correcte Nederlandse alinea zijn.
-    expected_output: >
-      De output is een volledig samengestelde alinea in het Nederlands, waarin alle relevante inputgegevens correct zijn verwerkt en waarbij logica op basis van adviesopvolging wordt toegepast.
-    agent: writer
+    Het eindresultaat moet een vloeiende, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De output is een volledig samengestelde alinea in het Nederlands, waarin alle relevante inputgegevens correct zijn verwerkt en waarbij logica op basis van adviesopvolging wordt toegepast.
+  agent: writer
 
 
 rewrite_task_risk_in_euros_damage_to_third_parties:
