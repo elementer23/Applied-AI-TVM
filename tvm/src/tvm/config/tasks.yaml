@@ -1,10 +1,7 @@
 rewrite_task_minrisk:
   description: >
-<<<<<<< HEAD
     Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
-=======
     Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken dit wordt aangegeven door: 'U heeft aangegeven dat u alle risico's tot een minimum wenst te beperken'. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input the halen en de haken te vervangen met de data.
->>>>>>> dev
     
     Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om alle trekkers + opleggers WA volledig casco te verzekeren. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
 
