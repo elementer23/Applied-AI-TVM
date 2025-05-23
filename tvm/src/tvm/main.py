@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 import sys
 import warnings
-import json
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel
-
 from datetime import datetime
 
-from tvm.crew import Tvm
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
+
+from crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -18,25 +20,33 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
+from authentication import *
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("ORIGINS_CALL"),
+    allow_methods=["*"],
+)
+
 class InputData(BaseModel):
     input: str
 
 @app.post("/run")
-def run(data: InputData):
+def run(data: InputData, current_user: User = Depends(get_current_user)):
     """
     Run the crew.
     """
     inputs = {
         'input': data.input,
     }
-    
+
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
-        #result = Tvm().crew().kickoff()
+        # result = Tvm().crew().kickoff()
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
-    return {"output":result.raw}
+    return {"output": result.raw}
 
 
 def train():

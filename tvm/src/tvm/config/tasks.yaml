@@ -1,6 +1,10 @@
 rewrite_task_minrisk:
   description: >
+<<<<<<< HEAD
     Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst. De informatie die ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input te halen en de blokhaken te vervangen met de data.
+=======
+    Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken dit wordt aangegeven door: 'U heeft aangegeven dat u alle risico's tot een minimum wenst te beperken'. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input the halen en de haken te vervangen met de data.
+>>>>>>> dev
     
     Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om alle trekkers + opleggers WA volledig casco te verzekeren. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
 
@@ -81,6 +85,18 @@ rewrite_task_risk_in_euros_damage_to_passengers:
     De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
   agent: writer
 
+  rewrite_task_customer_declines_advice:
+    description: >
+      Deze tekst wordt gebruikt wanneer de klant heeft aangegeven géén advies te willen ontvangen. stel alsnog een korte standaardtekst op waarmee het tekstpad op een correcte manier wordt afgesloten.
+
+      Gebruik deze standaardtekst: 
+      Tijdens de inventarisatie heeft u aangegeven geen behoefte te hebben aan een advies. Wij respecteren uw keuze. Houd er echter rekening mee dat het ontbreken van een passend verzekeringsadvies risico’s met zich mee kan brengen. Indien u op een later moment alsnog advies wenst, staan wij uiteraard voor u klaar.'
+
+      Het eindresultaat moet een grammaticaal correcte, zakelijke afsluiting zijn in het Nederlands. Voeg geen extra informatie toe.
+
+    expected_output: >
+      Een korte, afsluitende standaardtekst in het Nederlands.
+    agent: writer
 
 rewrite_task_deviate_from_identification_damage_to_third_parties:
   description: >
@@ -251,8 +267,46 @@ research:
   description: >
     Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
   expected_output: >
+    Inventaris
+    Risico tot minimum beperken of niet
     Eigen risico
     Verzekerd bedrag
     Advies wordt opgevolgd
     Reden dat advies niet wordt opgevolgd indien van toepassing
+    Overige context
   agent: reader
+
+
+rewrite_task_standstill_minrisk:
+  description: >
+    Deze tekst wordt altijd gebruikt wanneer de klant wenst alle risico's tot een minimum te beperken en het gaat over schade door stilstand. Stel de tekst op door informatie uit de input te gebruiken in de ondergenoemde standaard tekst, de informatie dat ingevuld moet worden staat tussen de blokhaken. Probeer alle benodigde data uit de input the halen en de blokhaken te vervangen met de data.
+
+    Je dient deze parameters te integreren in de volgende standaardtekst: 'Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
+
+    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
+    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' en voeg je direct de volgende waarschuwingsclausule toe: 'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
+
+rewrite_task_eigenrisico:
+  description: >
+    Deze tekst wordt gebruikt wanneer de klant een eigen risico van een bepaald bedrag wenst. Stel de tekst op door informatie uit de input te gebruiken in de onderstaande standaardtekst. De informatie die ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input te halen en vervang de haken met de juiste gegevens.
+
+    Je dient deze parameters te integreren in de volgende standaardtekst:
+    'Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van € (eigen risico bedrag) wilt en kunt dragen. Mijn advies is om (geen extra bedrijfskosten dekking af te sluiten/ een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op …. en het eigen risico van …./standaard eigen risico. Deze bedragen vindt u terug op de polis.). Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling_op_basis_van_advies).'
+
+    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
+
+    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:
+    'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
+
