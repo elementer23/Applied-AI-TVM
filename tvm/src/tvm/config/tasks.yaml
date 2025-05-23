@@ -294,21 +294,3 @@ research:
     Overige context
   agent: reader
 
-
-rewrite_task_eigenrisico:
-  description: >
-    Deze tekst wordt gebruikt wanneer de klant een eigen risico van een bepaald bedrag wenst. Stel de tekst op door informatie uit de input te gebruiken in de onderstaande standaardtekst. De informatie die ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input te halen en vervang de haken met de juiste gegevens.
-
-    Je dient deze parameters te integreren in de volgende standaardtekst:
-    'Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van € (eigen risico bedrag) wilt en kunt dragen. Mijn advies is om (geen extra bedrijfskosten dekking af te sluiten/ een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op …. en het eigen risico van …./standaard eigen risico. Deze bedragen vindt u terug op de polis.). Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling_op_basis_van_advies).'
-
-    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
-
-    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:
-    'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
-
-    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
-  expected_output: >
-    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
-  agent: writer
-
