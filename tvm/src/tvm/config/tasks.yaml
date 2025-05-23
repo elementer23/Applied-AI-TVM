@@ -1,4 +1,19 @@
-#third parties min risk
+  rewrite_task_thirdparty_minrisk:
+    description: >
+      Deze tekst wordt gebruikt wanneer de klant aangeeft alle risico's tot een minimum te willen beperken en het risicogebied schade aan derden of door eigen toedoen betreft. Gebruik informatie uit de input om onderstaande standaardtekst aan te vullen. Gegevens die ingevuld moeten worden staan tussen haakjes. Probeer alle vereiste data uit de input te halen en vervang de haakjes met de bijbehorende informatie.
+
+      Gebruik deze standaardtekst:  
+      'Tijdens onze beoordeling hebben wij vastgesteld dat u het risico op schade aan derden of door eigen toedoen tot een minimum wilt beperken. Mijn advies is om een aanvullende aansprakelijkheidsverzekering af te sluiten, afgestemd op het risico in uw specifieke situatie. Op basis van het verzekerde bedrag van € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico) zoals vermeld op uw polis, adviseer ik (invulling op basis van advies_opgevolgd en reden_niet_opvolgen).'
+
+      Als het advies wordt opgevolgd, vul je in: 'om mijn advies op te volgen.'
+
+      Als het advies niet wordt opgevolgd, vul je in: 'om mijn advies niet op te volgen, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:  
+      'Wij wijzen u erop dat het afwijken van dit advies serieuze gevolgen kan hebben voor uw aansprakelijkheidspositie. In sommige gevallen kan dit leiden tot hoge schadeclaims waarvoor u zelf verantwoordelijk bent. U bent zich hiervan bewust en accepteert dit risico.'
+
+      Het eindresultaat moet een vloeiende, grammaticaal correcte Nederlandse alinea zijn.
+    expected_output: >
+      De output is een volledig samengestelde alinea in het Nederlands, waarin alle relevante inputgegevens correct zijn verwerkt en waarbij logica op basis van adviesopvolging wordt toegepast.
+    agent: writer
 
 
 rewrite_task_risk_in_euros_damage_to_third_parties:
@@ -278,3 +293,22 @@ research:
     Reden dat advies niet wordt opgevolgd indien van toepassing
     Overige context
   agent: reader
+
+
+rewrite_task_eigenrisico:
+  description: >
+    Deze tekst wordt gebruikt wanneer de klant een eigen risico van een bepaald bedrag wenst. Stel de tekst op door informatie uit de input te gebruiken in de onderstaande standaardtekst. De informatie die ingevuld moet worden staat tussen de haken. Probeer alle benodigde data uit de input te halen en vervang de haken met de juiste gegevens.
+
+    Je dient deze parameters te integreren in de volgende standaardtekst:
+    'Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van € (eigen risico bedrag) wilt en kunt dragen. Mijn advies is om (geen extra bedrijfskosten dekking af te sluiten/ een extra bedrijfskosten dekking af te sluiten. Voor het verzekerde bedrag, gebaseerd op …. en het eigen risico van …./standaard eigen risico. Deze bedragen vindt u terug op de polis.). Voor het verzekerde bedrag, gebaseerd op € (basis_verzekerd_bedrag) en het eigen risico van € (eigen_risico). Deze bedragen vindt u terug op de polis. U geeft aan dat u (invulling_op_basis_van_advies).'
+
+    Indien het advies wordt opgevolgd, vul je in: 'mijn advies opvolgt.'
+
+    Indien het advies niet wordt opgevolgd, vul je in: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen).' Voeg in dat geval direct de volgende waarschuwingsclausule toe:
+    'Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+
+    Het eindresultaat moet één coherente, grammaticaal correcte Nederlandse alinea zijn.
+  expected_output: >
+    De verwachte output is een volledig samengestelde alinea in het Nederlands, die de verzamelde data correct verwerkt en de conditionele logica toepast.
+  agent: writer
+
