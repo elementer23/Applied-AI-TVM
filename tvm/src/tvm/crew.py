@@ -53,9 +53,38 @@ class Tvm():
         )
 
     @task
-    def rewrite_task_minrisk(self) -> Task:
+    def rewrite_task_thirdparty_minrisk(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_minrisk'], # type: ignore[index]
+            config=self.tasks_config['rewrite_task_thirdparty_minrisk'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_risk_in_euros_damage_to_third_parties(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_risk_in_euros_damage_to_third_parties'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_risk_in_euros_damage_to_third_parties(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_risk_in_euros_damage_to_third_parties'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_deviate_from_identification_damage_to_third_parties(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_deviate_from_identification_damage_to_third_parties'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_identify_by_risk_damage_to_third_parties(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_identify_by_risk_damage_to_third_parties'],
+            # type: ignore[index]
         )
 
     @task
@@ -66,15 +95,86 @@ class Tvm():
         )
 
     @task
-    def rewrite_task_customer_declines_advice(self) -> Task:
+    def rewrite_task_risk_in_euros_damage_by_standstill(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_customer_declines_advice'],
+            config=self.tasks_config['rewrite_task_risk_in_euros_damage_by_standstill'],
+            # type: ignore[index]
         )
 
     @task
-    def rewrite_task_eigenrisico(self) -> Task:
+    def rewrite_task_deviate_from_identification_damage_by_standstill(self) -> Task:
         return Task(
-            config=self.tasks_config['rewrite_task_eigenrisico'], # type: ignore[index]
+            config=self.tasks_config['rewrite_task_deviate_from_identification_damage_by_standstill'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_identify_by_risk_damage_by_standstill(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_identify_by_risk_damage_by_standstill'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_minrisk_loss_of_personal_items(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_minrisk_loss_of_personal_items'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_risk_in_euros_loss_of_personal_items(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_risk_in_euros_loss_of_personal_items'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_deviate_from_identification_loss_of_personal_items(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_deviate_from_identification_loss_of_personal_items'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_identify_by_risk_loss_of_personal_items(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_identify_by_risk_loss_of_personal_items'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_minrisk_damage_to_passengers(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_minrisk_damage_to_passengers'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_risk_in_euros_damage_to_passengers(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_risk_in_euros_damage_to_passengers'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_deviate_from_identification_damage_to_passengers(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_deviate_from_identification_damage_to_passengers'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_identify_by_risk_damage_to_passengers(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_identify_by_risk_damage_to_passengers'],
+            # type: ignore[index]
+        )
+
+    @task
+    def rewrite_task_customer_declines_advice(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_customer_declines_advice'],
         )
 
 
