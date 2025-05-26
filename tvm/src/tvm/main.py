@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 import sys
 import warnings
-import os
 from fastapi import FastAPI
-from pydantic import BaseModel
-from datetime import datetime
+from tvm.models import Base, InputData
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
 
 from crew import Tvm
 
@@ -20,6 +19,19 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
+SQLALCHEMY_DATABASE_URL = "sqlite:///./db.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 from authentication import *
 
 app.add_middleware(
@@ -27,9 +39,6 @@ app.add_middleware(
     allow_origins=os.getenv("ORIGINS_CALL"),
     allow_methods=["*"],
 )
-
-class InputData(BaseModel):
-    input: str
 
 @app.post("/run")
 def run(data: InputData, current_user: User = Depends(get_current_user)):
