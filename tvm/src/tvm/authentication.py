@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy import Column, Integer, String, create_engine
+from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, create_engine, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from jose import JWTError, jwt
@@ -8,10 +9,12 @@ from passlib.context import CryptContext
 from typing import Optional
 from datetime import datetime, timedelta
 import os
+import secrets
 
 SECRET_KEY = os.environ.get("SECRET")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_DAYS = 1
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./db.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -25,6 +28,19 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(String, default="user")  # 'admin' or 'user'
+
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String, unique=True, index=True)
+    user_id = Column(Integer, index=True)
+    expires_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
 
 
 Base.metadata.create_all(bind=engine)
@@ -50,6 +66,7 @@ def get_password_hash(password):
 
 
 def authenticate_user(db: Session, username: str, password: str):
+    # Look for user in DB and verify password
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_password(password, user.hashed_password):
         return False
@@ -58,9 +75,78 @@ def authenticate_user(db: Session, username: str, password: str):
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
-    to_encode.update({"exp": expire})
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire, "type": "access"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def cleanup_expired_tokens(db: Session):
+    # Remove all expired refresh tokens from database
+    current_time = datetime.utcnow()
+    deleted_count = db.query(RefreshToken).filter(
+        RefreshToken.expires_at < current_time
+    ).delete()
+    db.commit()
+    return deleted_count
+
+
+def create_refresh_token(db: Session, user_id: int):
+    # Clean up expired tokens globally
+    cleanup_expired_tokens(db)
+
+    # Generate a secure random token
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+
+    # Delete old refresh tokens for this user (complete removal)
+    db.query(RefreshToken).filter(
+        RefreshToken.user_id == user_id
+    ).delete()
+
+    # Create new refresh token
+    refresh_token = RefreshToken(
+        token=token,
+        user_id=user_id,
+        expires_at=expires_at
+    )
+    db.add(refresh_token)
+    db.commit()
+
+    return token
+
+
+def verify_refresh_token(db: Session, token: str):
+    # Clean up expired tokens before verification
+    cleanup_expired_tokens(db)
+
+    # Look for token in DB
+    refresh_token = db.query(RefreshToken).filter(
+        RefreshToken.token == token,
+        RefreshToken.expires_at > datetime.utcnow()
+    ).first()
+
+    # Token not found in DB
+    if not refresh_token:
+        return None
+
+    # Search for user and return it based on refresh token
+    user = db.query(User).filter(User.id == refresh_token.user_id).first()
+    return user
+
+
+def revoke_refresh_token(db: Session, token: str):
+    # Delete the refresh token completely
+    db.query(RefreshToken).filter(RefreshToken.token == token).delete()
+    db.commit()
+
+
+def revoke_all_user_tokens(db: Session, user_id: int):
+    # Delete all tokens of a specific user
+    deleted_count = db.query(RefreshToken).filter(
+        RefreshToken.user_id == user_id
+    ).delete()
+    db.commit()
+    return deleted_count
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -72,10 +158,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        token_type: str = payload.get("type")
+
+        if username is None or token_type != "access":
             raise credentials_exception
     except JWTError:
         raise credentials_exception
+
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise credentials_exception
@@ -92,21 +181,68 @@ def verify_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        token_type: str = payload.get("type")
+
+        if username is None or token_type != "access":
             raise HTTPException(status_code=403, detail="Token is invalid or expired.")
         return payload
     except JWTError:
         raise HTTPException(status_code=403, detail="Token is invalid or expired.")
 
+
 from main import app
+
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
+
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = create_refresh_token(db, user.id)
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    }
+
+
+@app.post("/token/refresh")
+async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    user = verify_refresh_token(db, request.refresh_token)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+
+    # Create new access token
+    access_token = create_access_token(data={"sub": user.username})
+
+    # Create a new refresh token for token rotation
+    new_refresh_token = create_refresh_token(db, user.id)
+
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer",
+        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    }
+
+
+@app.post("/token/revoke")
+async def revoke_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    revoke_refresh_token(db, request.refresh_token)
+    return {"message": "Token revoked successfully"}
+
+
+@app.post("/logout")
+async def logout(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    deleted_count = revoke_all_user_tokens(db, current_user.id)
+    return {"message": f"Logged out successfully. Removed {deleted_count} tokens."}
 
 
 @app.post("/users/")
@@ -131,4 +267,4 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 @app.get("/verify-token/{token}")
 async def verify_user_token(token: str):
     verify_token(token=token)
-    return { "message": "Token is valid"}
+    return {"message": "Token is valid"}
