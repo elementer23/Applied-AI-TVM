@@ -103,6 +103,13 @@ class Tvm():
             context=[self.research()]
         )
 
+    @task
+    def rewrite_task_eigenrisico(self) -> Task:
+        return Task(
+            config=self.tasks_config['rewrite_task_eigenrisico'], # type: ignore[index]
+        )
+
+
     @crew
     def crew(self) -> Crew:
         """Creates the Tvm crew"""
