@@ -1,10 +1,8 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from typing import List
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from typing import List, Dict, Any
+
 
 @CrewBase
 class Tvm():
@@ -13,56 +11,96 @@ class Tvm():
     agents: List[BaseAgent]
     tasks: List[Task]
 
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
-
-    # dont include manager in agent list
-    def manager(self) -> Agent:
-        return Agent(
-            config=self.agents_config['manager'],  # type: ignore[index]
-            verbose=True,
-            allow_delegation=True,
-        )
-
     @agent
     def reader(self) -> Agent:
         return Agent(
-            config=self.agents_config['reader'],  # type: ignore[index]
+            config=self.agents_config['reader'],
             verbose=True,
         )
 
     @agent
     def writer(self) -> Agent:
         return Agent(
-            config=self.agents_config['writer'], # type: ignore[index]
+            config=self.agents_config['writer'],
             verbose=True,
         )
-
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
 
     @task
     def research(self) -> Task:
         return Task(
-            config=self.tasks_config['research'], # type: ignore[index]
+            config=self.tasks_config['research'],
+            agent=self.reader()
         )
 
     @task
-    def rewrite_task_minrisk(self) -> Task:
-        return Task(
-            config=self.tasks_config['rewrite_task_minrisk'], # type: ignore[index]
-        )
+    def decide_and_execute_rewrite(self) -> Task:
 
-    @task
-    def rewrite_task_standstill_minrisk(self) -> Task:
+        rewrite_configs = {
+            'minrisk_damage_to_third_parties': self.tasks_config['rewrite_task_minrisk_damage_to_third_parties'],
+            'risk_in_euros_damage_to_third_parties': self.tasks_config[
+                'rewrite_task_risk_in_euros_damage_to_third_parties'],
+            'deviate_from_identification_damage_to_third_parties': self.tasks_config[
+                'rewrite_task_deviate_from_identification_damage_to_third_parties'],
+            'identify_by_risk_damage_to_third_parties': self.tasks_config[
+                'rewrite_task_identify_by_risk_damage_to_third_parties'],
+            'minrisk_damage_by_standstill': self.tasks_config['rewrite_task_minrisk_damage_by_standstill'],
+            'risk_in_euros_damage_by_standstill': self.tasks_config['rewrite_task_risk_in_euros_damage_by_standstill'],
+            'deviate_from_identification_damage_by_standstill': self.tasks_config[
+                'rewrite_task_deviate_from_identification_damage_by_standstill'],
+            'identify_by_risk_damage_by_standstill': self.tasks_config[
+                'rewrite_task_identify_by_risk_damage_by_standstill'],
+            'minrisk_loss_of_personal_items': self.tasks_config['rewrite_task_minrisk_loss_of_personal_items'],
+            'risk_in_euros_loss_of_personal_items': self.tasks_config[
+                'rewrite_task_risk_in_euros_loss_of_personal_items'],
+            'deviate_from_identification_loss_of_personal_items': self.tasks_config[
+                'rewrite_task_deviate_from_identification_loss_of_personal_items'],
+            'identify_by_risk_loss_of_personal_items': self.tasks_config[
+                'rewrite_task_identify_by_risk_loss_of_personal_items'],
+            'minrisk_damage_to_passengers': self.tasks_config['rewrite_task_minrisk_damage_to_passengers'],
+            'risk_in_euros_damage_to_passengers': self.tasks_config['rewrite_task_risk_in_euros_damage_to_passengers'],
+            'deviate_from_identification_damage_to_passengers': self.tasks_config[
+                'rewrite_task_deviate_from_identification_damage_to_passengers'],
+            'identify_by_risk_damage_to_passengers': self.tasks_config[
+                'rewrite_task_identify_by_risk_damage_to_passengers'],
+            'customer_declines_advice': self.tasks_config['rewrite_task_customer_declines_advice'],
+        }
+
+        combined_description = f"""
+        Based on the research results, analyze the client's needs and determine which ONE rewrite task to execute, then execute it.
+
+        STEP 1: DECISION LOGIC
+        - If client wants to minimize ALL risks + third party damage → select minrisk_damage_to_third_parties
+        - If client has euro risk tolerance + third party damage → select risk_in_euros_damage_to_third_parties
+        - If client wants higher risk than assessed + third party damage → select deviate_from_identification_damage_to_third_parties
+        - If client wants per-risk assessment + third party damage → select identify_by_risk_damage_to_third_parties
+        - If client wants to minimize ALL risks + standstill → select minrisk_damage_by_standstill
+        - If client has euro risk tolerance + standstill → select risk_in_euros_damage_by_standstill
+        - If client wants higher risk than assessed + standstill → select deviate_from_identification_damage_by_standstill
+        - If client wants per-risk assessment + standstill → select identify_by_risk_damage_by_standstill
+        - If client wants to minimize ALL risks + personal items → select minrisk_loss_of_personal_items
+        - If client has euro risk tolerance + personal items → select risk_in_euros_loss_of_personal_items
+        - If client wants higher risk than assessed + personal items → select deviate_from_identification_loss_of_personal_items
+        - If client wants per-risk assessment + personal items → select identify_by_risk_loss_of_personal_items
+        - If client wants to minimize ALL risks + passengers → select minrisk_damage_to_passengers
+        - If client has euro risk tolerance + passengers → select risk_in_euros_damage_to_passengers
+        - If client wants higher risk than assessed + passengers → select deviate_from_identification_damage_to_passengers
+        - If client wants per-risk assessment + passengers → select identify_by_risk_damage_to_passengers
+        - If client explicitly declines advice → select customer_declines_advice
+
+        STEP 2: EXECUTE THE SELECTED TASK
+        Once you determine which task to use, execute it exactly according to its specific instructions:
+
+        Available tasks and their instructions:
+        """
+
+        for task_name, config in rewrite_configs.items():
+            combined_description += f"\n\n**{task_name}:**\n{config['description']}\n"
+
         return Task(
-            config=self.tasks_config['rewrite_task_standstill_minrisk'],
-            # type: ignore[index]
+            description=combined_description,
+            expected_output="Een complete Nederlandse alinea volgens de geselecteerde rewrite task, met alle parameters correct ingevuld uit de research data.",
+            agent=self.writer(),
+            context=[self.research()]
         )
 
     @task
@@ -75,15 +113,9 @@ class Tvm():
     @crew
     def crew(self) -> Crew:
         """Creates the Tvm crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
-            process=Process.hierarchical,
+            agents=self.agents,
+            tasks=self.tasks,
+            process=Process.sequential,
             verbose=True,
-            manager_agent=self.manager(),
-
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
