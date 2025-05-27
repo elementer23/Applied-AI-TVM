@@ -82,3 +82,27 @@ async def create_conversation(
     db.refresh(new_conversation)
 
     return new_conversation
+
+
+@app.delete("/conversations")
+async def delete_all_conversations(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    conversations = db.query(Conversation).filter(
+        Conversation.user_id == current_user.id
+    ).all()
+
+    conversation_count = len(conversations)
+
+    if conversation_count == 0:
+        return {"message": "No conversations found"}
+
+    for conversation in conversations:
+        db.delete(conversation)
+
+    db.commit()
+
+    return {
+        "message": f"All {conversation_count} conversations deleted successfully",
+    }
