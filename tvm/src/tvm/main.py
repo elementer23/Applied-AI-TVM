@@ -2,7 +2,7 @@
 import sys
 import warnings
 from fastapi import FastAPI
-from tvm.models import Base, InputData
+from models import Base, InputData
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -38,6 +38,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ORIGINS_CALL"),
     allow_methods=["*"],
+    allow_credentials=True,
+    allow_headers=["*"],
 )
 
 @app.post("/run")

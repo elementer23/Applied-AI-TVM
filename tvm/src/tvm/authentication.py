@@ -7,7 +7,7 @@ from typing import Optional
 from datetime import datetime, timedelta
 import os
 import secrets
-from tvm.models import User, RefreshToken, RefreshTokenRequest
+from models import User, RefreshToken, RefreshTokenRequest
 from main import get_db
 
 SECRET_KEY = os.environ.get("SECRET")
