@@ -65,3 +65,20 @@ async def delete_conversation(
     db.commit()
 
     return {"message": f"Conversation {conversation_id} deleted successfully"}
+
+
+@app.post("/conversations", response_model=ConversationResponse)
+async def create_conversation(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    new_conversation = Conversation(
+        user_id=current_user.id,
+        created_at=datetime.utcnow()
+    )
+
+    db.add(new_conversation)
+    db.commit()
+    db.refresh(new_conversation)
+
+    return new_conversation
