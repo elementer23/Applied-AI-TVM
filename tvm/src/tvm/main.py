@@ -41,8 +41,9 @@ app.add_middleware(
     allow_methods=["*"],
 )
 
+
 @app.post("/run")
-def run(data: InputData, current_user: User = Depends(get_current_user)):
+def run(data: InputData, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Run the crew.
     """
@@ -52,11 +53,60 @@ def run(data: InputData, current_user: User = Depends(get_current_user)):
 
     try:
         result = Tvm().crew().kickoff(inputs=inputs)
-        # result = Tvm().crew().kickoff()
+        ai_response = result.raw
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
-    return {"output": result.raw}
+    conversation = None
+    conversation_created = False
+
+    # If conversation is specified in input
+    if data.conversation_id:
+        conversation = db.query(Conversation).filter(
+            Conversation.id == data.conversation_id,
+            Conversation.user_id == current_user.id
+        ).first()
+
+    # If no conversation was found, create a new one
+    if not conversation:
+        conversation = Conversation(
+            user_id=current_user.id,
+            created_at=datetime.utcnow()
+        )
+        db.add(conversation)
+        db.commit()
+        db.refresh(conversation)
+        conversation_created = True
+
+    # Add the user message to the conversation
+    user_message = Message(
+        conversation_id=conversation.id,
+        content=data.input,
+        is_user_message=True,
+        created_at=datetime.utcnow()
+    )
+    db.add(user_message)
+
+    # Add the AI response to the conversation
+    ai_message = Message(
+        conversation_id=conversation.id,
+        content=ai_response,
+        is_user_message=False,
+        created_at=datetime.utcnow()
+    )
+    db.add(ai_message)
+
+    db.commit()
+    db.refresh(user_message)
+    db.refresh(ai_message)
+
+    return {
+        "output": ai_response,
+        "conversation_id": conversation.id,
+        "conversation_created": conversation_created,
+        "user_message_id": user_message.id,
+        "ai_message_id": ai_message.id
+    }
 
 
 def train():

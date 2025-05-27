@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
@@ -49,6 +51,7 @@ class Message(Base):
 
 class InputData(BaseModel):
     input: str
+    conversation_id: Optional[int] = None
 
 
 class RefreshTokenRequest(BaseModel):
