@@ -33,6 +33,7 @@ def get_db():
         db.close()
 
 from authentication import *
+from chat import *
 
 app.add_middleware(
     CORSMiddleware,

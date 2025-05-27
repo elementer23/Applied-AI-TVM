@@ -14,6 +14,8 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(String, default="user")  # 'admin' or 'user'
 
+    conversations = relationship("Conversation", back_populates="user")
+
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
@@ -51,3 +53,23 @@ class InputData(BaseModel):
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
+
+
+class ConversationResponse(BaseModel):
+    id: int
+    user_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class MessageResponse(BaseModel):
+    id: int
+    conversation_id: int
+    content: str
+    is_user_message: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
