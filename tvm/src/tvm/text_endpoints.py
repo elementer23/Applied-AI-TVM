@@ -10,6 +10,9 @@ from datetime import datetime
 # Get all categories
 @app.get("/categories/")
 def read_categories(db: Session = Depends(get_db)):
+    """
+    Get all categories of risks.
+    """
     categories = db.query(Category).all()
     if not categories:
         return HTTPException(status_code=404, detail="No categories found.")
@@ -18,6 +21,9 @@ def read_categories(db: Session = Depends(get_db)):
 # Get the category with the given ID
 @app.get("/categories/{category_id}")
 def read_category(category_id: int, db: Session = Depends(get_db)):
+    """
+    Get a specific category of risk for the given ID.
+    """
     category = db.get(Category, category_id)
     if not category:
         return HTTPException(status_code=404, detail="Category not found.")
@@ -26,6 +32,9 @@ def read_category(category_id: int, db: Session = Depends(get_db)):
 # Create a new category
 @app.post("/categories/")
 def create_category(category_name: str, db: Session = Depends(get_db)):
+    """
+    Create a new category of risk.
+    """
     category = db.get(Category, category_name)
     if category:
         raise HTTPException(status_code=400, detail="This category already exists.")
@@ -38,6 +47,9 @@ def create_category(category_name: str, db: Session = Depends(get_db)):
 # Update the category with the given ID
 @app.put("/categories/{category_id}")
 def update_category(category_id: int, category_name: str, db: Session = Depends(get_db)):
+    """
+    Update a specific category of risk for the given ID.
+    """
     category = db.get(Category, category_id)
     if not category:
         return HTTPException(status_code=404, detail="Category not found.")
@@ -49,6 +61,9 @@ def update_category(category_id: int, category_name: str, db: Session = Depends(
 # Delete the category with the given ID
 @app.delete("/categories/{category_id}")
 def delete_category(category_id: int, db: Session = Depends(get_db)):
+    """
+    Delete the category of risk corresponding to the given ID.
+    """
     category = db.get(Category, category_id)
     if not category:
         return HTTPException(status_code=404, detail="Category not found.")
@@ -60,6 +75,9 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
 # Get all subcategories
 @app.get("/subcategories/")
 def read_subcategories(db: Session = Depends(get_db)):
+    """
+    Gets all subcategories of risk willingness.
+    """
     subcategories = db.query(SubCategory).all()
     if not subcategories:
         return HTTPException(status_code=404, detail="No subcategories found.")
@@ -68,6 +86,9 @@ def read_subcategories(db: Session = Depends(get_db)):
 # Get the subcategory with the given ID
 @app.get("/subcategories/{subcategory_id}")
 def read_subcategory(subcategory_id: int, db: Session = Depends(get_db)):
+    """
+    Gets a specific subcategory of risk willingness corresponding to the given ID.
+    """
     subcategory = db.query(SubCategory).filter(SubCategory.id == subcategory_id).first()
     if not subcategory:
         return HTTPException(status_code=404, detail="Subcategory not found.")
@@ -76,6 +97,9 @@ def read_subcategory(subcategory_id: int, db: Session = Depends(get_db)):
 # Create a new subcategory
 @app.post("/subcategories/")
 def create_subcategory(subcategory_name: str, db: Session = Depends(get_db)):
+    """
+    Creates a new subcategory of risk willingness.
+    """
     subcategory = db.query(SubCategory).filter(SubCategory.name == subcategory_name).first()
     if subcategory:
         raise HTTPException(status_code=400, detail="This subcategory already exists.")
@@ -88,6 +112,9 @@ def create_subcategory(subcategory_name: str, db: Session = Depends(get_db)):
 # Update the subcategory with the given ID
 @app.put("/subcategories/{subcategory_id}")
 def update_subcategory(subcategory_id: int, subcategory_name: str, db: Session = Depends(get_db)):
+    """
+    Update a specific subcategory of risk willingness for the given ID.
+    """
     subcategory = db.get(SubCategory, subcategory_id)
     if not subcategory:
         return HTTPException(status_code=404, detail="Subcategory not found.")
@@ -99,6 +126,9 @@ def update_subcategory(subcategory_id: int, subcategory_name: str, db: Session =
 # Delete the subcategory with the given ID
 @app.delete("/subcategories/{subcategory_id}")
 def delete_category(subcategory_id: int, db: Session = Depends(get_db)):
+    """
+    Delete the subcategory of risk willingness corresponding to the given ID.
+    """
     subcategory = db.get(SubCategory, subcategory_id)
     if not subcategory:
         return HTTPException(status_code=404, detail="Subcategory not found.")
@@ -110,6 +140,9 @@ def delete_category(subcategory_id: int, db: Session = Depends(get_db)):
 # Gets all advice texts
 @app.get("/advisorytexts/")
 def read_texts(db: Session = Depends(get_db)):
+    """
+    Gets all advisory texts templates.
+    """
     advisorytexts = db.query(AdvisoryText).all()
     if not advisorytexts:
         return HTTPException(status_code=404, detail="No advice texts found.")
@@ -118,6 +151,9 @@ def read_texts(db: Session = Depends(get_db)):
 # Gets the advice text with the given composite ID's
 @app.get("/advisorytexts/catid={category_id}&subid={subcategory_id}")
 def read_text(catid: int, subid: int, db: Session = Depends(get_db)):
+    """
+    Gets a specific advisory text template for a given category and subcategory.
+    """
     advisorytext = db.query(AdvisoryText).filter(AdvisoryText.category_id == catid && AdvisoryText.subcategory_id == subid).first()
     if not advisorytext:
         return HTTPException(status_code=404, detail="Advice text not found.")
@@ -126,6 +162,9 @@ def read_text(catid: int, subid: int, db: Session = Depends(get_db)):
 # Create new advice text
 @app.post("/advisorytexts/")
 def create_text(advice_text: str, db: Session = Depends(get_db)):
+    """
+    Creates a new advisory text template.
+    """
     advice = db.query(AdvisoryText).filter(AdvisoryText.text == advice_text).first()
     if advice:
         raise HTTPException(status_code=400, detail="This text already exists.")
@@ -138,6 +177,9 @@ def create_text(advice_text: str, db: Session = Depends(get_db)):
 # Edits the advice text with the given ID
 @app.put("/advisorytexts/catid={category_id}&subid={subcategory_id}")
 def update_text(catid: int, subid: int, advice_text: str, db: Session = Depends(get_db)):
+    """
+    Updates an existing advisory text template for a given category and subcategory.
+    """
     advisorytext = db.query(AdvisoryText).filter(AdvisoryText.category_id == catid && AdvisoryText.subcategory_id == subid).first()
     if not advisorytext:
         return HTTPException(status_code=404, detail="Advice text not found.")
@@ -149,6 +191,9 @@ def update_text(catid: int, subid: int, advice_text: str, db: Session = Depends(
 # Deletes the advice text with the given ID
 @app.delete("/advisorytexts/catid={category_id}&subid={subcategory_id}")
 def delete_text(catid: int, subid: int, db: Session = Depends(get_db)):
+    """
+    Deletes a specific advisory text template for a given category and subcategory.
+    """
     advisorytext = db.query(AdvisoryText).filter(AdvisoryText.category_id == catid && AdvisoryText.subcategory_id == subid).first()
     if not advisorytext:
         return HTTPException(status_code=404, detail="Advice text not found.")
