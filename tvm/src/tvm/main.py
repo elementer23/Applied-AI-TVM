@@ -17,7 +17,20 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 # Replace with inputs you want to test with, it will automatically
 # interpolate any tasks and agents information
 
-app = FastAPI()
+tags_metadata = [
+    {
+        "name": "Authentication",
+        "description": "All authentication endpoints",
+    },
+    {
+        "name": "Chat",
+        "description": "All endpoints for managing conversations and messages",
+    }
+]
+
+app = FastAPI(openapi_tags=tags_metadata,
+              title="TVM AI",
+              version="0.0.1",)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./db.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -44,10 +57,10 @@ app.add_middleware(
 )
 
 
-@app.post("/run")
+@app.post("/run", tags=["Chat"])
 def run(data: InputData, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
-    Run the crew.
+    Send a message and run the crew.
     """
     inputs = {
         'input': data.input,
