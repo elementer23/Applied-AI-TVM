@@ -24,16 +24,18 @@ class RefreshToken(Base):
 
 class Category(Base):
     __tablename__ = "categories"
-    name = Column(String, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
 
 class SubCategory(Base):
     __tablename__ = "sub_categories"
-    name = Column(String, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
 
 class AdvisoryText(Base):
     __tablename__ = "advisory_texts"
-    category_name = Column(String, ForeignKey("categories.name"), primary_key=True)
-    sub_category_name = Column(String, ForeignKey("sub_categories.name"), primary_key=True)
+    category = Column(Integer, ForeignKey("categories.id"), primary_key=True)
+    sub_category = Column(Integer, ForeignKey("sub_categories.id"), primary_key=True)
     text = Column(String)
 
 class InputData(BaseModel):

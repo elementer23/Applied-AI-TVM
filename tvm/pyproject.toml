@@ -5,12 +5,12 @@ description = "TVM using crewAI"
 authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10,<3.13"
 dependencies = [
-    "crewai[tools]>=0.119.0,<1.0.0",
-    "google-genai==1.15.0",
-    "google-generativeai>=0.8.5",
-    "passlib>=1.7.4",
-    "python-jose>=3.4.0",
-    "python-multipart>=0.0.20",
+	"crewai[tools]>=0.119.0,<1.0.0",
+	"google-genai==1.15.0",
+	"google-generativeai>=0.8.5",
+	"passlib>=1.7.4",
+	"python-jose>=3.4.0",
+	"python-multipart>=0.0.20",
 ]
 
 [project.scripts]
