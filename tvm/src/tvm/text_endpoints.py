@@ -83,7 +83,7 @@ def create_subcategory(subcategory_name: str, db: Session = Depends(get_db)):
     db.add(new_subcategory)
     db.commit()
     db.refresh(new_subcategory)
-    return Response(status_code=201,content=f"Subcategory {subcategory_name} successfully created.")
+    return Response(status_code=201, content=f"Subcategory {subcategory_name} successfully created.")
 
 # Update the subcategory with the given ID
 @app.put("/subcategories/{subcategory_id}")
