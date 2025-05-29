@@ -1,8 +1,7 @@
 import json
-
 from dotenv import load_dotenv
-
 from tvm.models import AdvisoryText
+from models import AdvisoryText
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
