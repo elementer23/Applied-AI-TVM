@@ -4,8 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
 # uses knowledge/templates.json to seed the database with data in absence of a front-end.
-
-engine = create_engine("sqlite:///./db.db")
+engine = create_engine("mysql+pymysql://root:@localhost:3306/tvm")
 Session = sessionmaker(bind=engine)
 session = Session()
 
