@@ -2,7 +2,7 @@ import json
 
 from dotenv import load_dotenv
 
-from tvm.models import Category, SubCategory, AdvisoryText
+from tvm.models import AdvisoryText
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
@@ -17,28 +17,11 @@ session = Session()
 with open("knowledge/templates.json") as f:
     data = json.load(f)
 
-# Create categories
-name_to_cat = {}
-for c in data["categories"]:
-    cat = Category(name=c["name"])
-    session.add(cat)
-    session.flush()  # get ID without full commit
-    name_to_cat[c["name"]] = cat.id
-
-
-# Create subcategories
-name_to_sub = {}
-for s in data["subcategories"]:
-    sub = SubCategory(name=s["name"])
-    session.add(sub)
-    session.flush()
-    name_to_sub[s["name"]] = sub.id
-
-# Create advisory texts
+# Create advisory texts directly with category and subcategory names
 for a in data["advisory_texts"]:
     advisory = AdvisoryText(
-        category=name_to_cat[a["category"]],
-        sub_category=name_to_sub[a["sub_category"]],
+        category=a["category"],
+        sub_category=a["sub_category"],
         text=a["text"]
     )
     session.add(advisory)
