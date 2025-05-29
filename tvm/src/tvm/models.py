@@ -48,7 +48,7 @@ class AdvisoryText(Base):
 
 class Conversation(Base):
     __tablename__ = "conversations"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -58,9 +58,9 @@ class Conversation(Base):
 
 class Message(Base):
     __tablename__ = "messages"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False, index=True)
-    content = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
     is_user_message = Column(Boolean, nullable=False)  # True (1) if sent by user, False (0) if sent by AI
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
