@@ -7,7 +7,28 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from starlette.middleware.cors import CORSMiddleware
+from sqlalchemy.engine.url import make_url
+import embedchain.loaders.mysql as mysql_loader_module
 
+_original_init = mysql_loader_module.MySQLLoader.__init__
+
+
+def patched_init(self, config):
+    url = config.get("url")
+    if url:
+        parsed_url = make_url(url)
+        config = {
+            "host": parsed_url.host,
+            "user": parsed_url.username,
+            "password": parsed_url.password,
+            "port": parsed_url.port,
+            "database": parsed_url.database,
+        }
+
+    _original_init(self, config)
+
+
+mysql_loader_module.MySQLLoader.__init__ = patched_init
 from crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
