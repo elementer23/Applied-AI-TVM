@@ -3,9 +3,13 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict, Any
 from crewai_tools import MySQLSearchTool
+import os
 
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="../../.env")
 sql_search = MySQLSearchTool(
-    db_uri = 'mysql://root:admin@localhost:3306/tvm',
+    db_uri = os.getenv("SQL_CONNECTION"),
     table_name='advisory_texts'
 )
 
@@ -138,7 +142,7 @@ class Tvm():
                    - Example search query: "minimize all risks for damage to third parties"
                    - Use this query with the tool in the format:
                      ```json
-                     { "search_query": "..." }
+                     { "body": "your question for the database","response": "application/json" }
                      ```
 
                 ⚠️ Do **not** use SQL — this tool accepts only natural language search queries.
