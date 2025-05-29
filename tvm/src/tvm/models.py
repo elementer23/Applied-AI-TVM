@@ -27,22 +27,11 @@ class RefreshToken(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
-class Category(Base):
-    __tablename__ = "categories"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=False)
-
-
-class SubCategory(Base):
-    __tablename__ = "sub_categories"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=False)
-
-
 class AdvisoryText(Base):
     __tablename__ = "advisory_texts"
-    category = Column(Integer, ForeignKey("categories.id"), primary_key=True)
-    sub_category = Column(Integer, ForeignKey("sub_categories.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    category = Column(String(255))
+    sub_category = Column(String(255))
     text = Column(Text)
 
 
