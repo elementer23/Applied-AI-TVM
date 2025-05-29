@@ -1,7 +1,20 @@
 from getpass import getpass
 
-from authentication import get_password_hash, SessionLocal, User
+from dotenv import load_dotenv
+from passlib.context import CryptContext
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import os
 
+from models import User
+
+
+load_dotenv(dotenv_path="../../.env")
+SQLALCHEMY_DATABASE_URL = os.getenv("SQL_CONNECTION")
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_admin():
     db = SessionLocal()
@@ -28,6 +41,10 @@ def create_admin():
     db.commit()
     db.close()
     print(f"Admin user '{username}' created successfully.")
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
 
 
 if __name__ == "__main__":
