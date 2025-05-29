@@ -10,9 +10,25 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path="../../.env")
 sql_search = MySQLSearchTool(
     db_uri = os.getenv("SQL_CONNECTION"),
-    table_name='advisory_texts'
+    table_name='advisory_texts',
+    config=dict(
+        llm=dict(
+            provider="openai", # or google, openai, anthropic, llama2, ...
+            config=dict(
+                model="gpt-4.1-mini",
+                # temperature=0.5,
+                # top_p=1,
+                # stream=true,
+            ),
+        ),
+        embedder=dict(
+            provider="openai",
+            config=dict(
+                model="text-embedding-3-small",  # newer, faster, cheaper
+            )
+        )
+    )
 )
-
 
 @CrewBase
 class Tvm():
@@ -114,65 +130,52 @@ class Tvm():
     #         context=[self.research()]
     #     )
     @task
-    def formulate_template_query(self) -> Task:
+    def decide_template_category(self) -> Task:
         return Task(
             description="""
-            Based on the client’s needs and the research data, generate a concise natural-language query
-            that would help retrieve the most relevant rewrite template from the SQL database.
-
-            Make sure the query reflects the type of risk (third parties, passengers, etc.)
-            and the risk strategy (minimize risk, risk in euros, etc.).
-            """,
-            expected_output="An SQL statement along the following lines(fill in CATEGORY_NAME & SUB_CATEGORY_NAME):SELECT at.text FROM advisory_texts at JOIN categories c ON at.category_id = c.id JOIN sub_categories sc ON at.sub_category_id = sc.id WHERE c.name = 'CATEGORY_NAME' AND sc.name = 'SUB_CATEGORY_NAME';",
+                Analyze the research context to determine which advisory text best fits the client's needs.
+    
+                You must choose a CATEGORY and SUBCATEGORY based on their request. Do not fabricate.
+    
+                Output exactly this JSON format:
+                {
+                    "category": "CATEGORY_NAME_HERE",
+                    "sub_category": "SUBCATEGORY_NAME_HERE"
+                }
+                """,
+            expected_output="A JSON with 'category' and 'sub_category' fields.",
             agent=self.reader(),
             context=[self.research()]
         )
 
     @task
-    def query_advisory_template(self) -> Task:
+    def fetch_template_from_db(self) -> Task:
         return Task(
             description="""
-                You are given research findings about a client's risk preferences and situations.
-
-                Your task is to:
-                1. Determine the most appropriate **category** and **subcategory** based on the client's needs.
-                   - For example, if the client is concerned with third-party damage and wants to minimize risk, the category may be "damage to third parties" and the subcategory may be "minimize all risks".
-                2. Use the `Search a database's table content` tool to search for an advisory text.
-                   - You must query using a **natural language phrase** that semantically describes the category and subcategory.
-                   - Example search query: "minimize all risks for damage to third parties"
-                   - Use this query with the tool in the format:
-                     ```json
-                     { "body": "your question for the database","response": "application/json" }
-                     ```
-
-                ⚠️ Do **not** use SQL — this tool accepts only natural language search queries.
-
-                Once you retrieve the advisory text:
-                - Rewrite it into a **single, complete Dutch paragraph**.
-                - Ensure the paragraph uses correct and formal Dutch.
-                - Fill in any parameters using the research context.
-
-                Your final output should be:
-                - A single rewritten Dutch paragraph tailored to the client's needs.
+                Use the `sql_search` tool to retrieve the advisory text from the database using the category and subcategory provided.
+    
+                Use the following query format:
+                "category = CATEGORY_NAME_HERE and sub_category = SUBCATEGORY_NAME_HERE"
+    
+                Only use the tool. Do not attempt to answer without it.
                 """,
-            expected_output="Een volledige, herschreven Nederlandse paragraaf gebaseerd op het gevonden advies, correct afgestemd op de onderzoekscontext.",
-            agent=self.writer(),  # assuming `self.writer()` returns your writer agent
-            context=[self.research()],
-            tools=[sql_search]
+            expected_output="The advisory template text from the database.",
+            tools=[sql_search],
+            agent=self.reader(),
+            context=[self.decide_template_category()]
         )
 
     @task
-    def generate_rewrite(self) -> Task:
+    def fill_in_template(self) -> Task:
         return Task(
             description="""
-            Using the template retrieved from the database and the research context, write a complete
-            Dutch paragraph that rewrites the client's situation according to the provided template.
-
-            Fill in any template parameters using information from the research data.
-            """,
-            expected_output="Een complete Nederlandse alinea op basis van het template en de onderzoeksdata.",
+                Fill in the advisory template using the research information. Ensure proper Dutch grammar and that all variables are replaced appropriately.
+    
+                Use only the template provided in context. Do not add other suggestions.
+                """,
+            expected_output="Een herschreven advies in het Nederlands, op basis van het gegeven sjabloon.",
             agent=self.writer(),
-            context=[self.research()]
+            context=[self.research(), self.fetch_template_from_db()]
         )
 
     # @task
