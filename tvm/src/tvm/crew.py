@@ -2,6 +2,8 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict, Any
+from tools import rag
+
 
 
 @CrewBase
@@ -119,3 +121,4 @@ class Tvm():
             process=Process.sequential,
             verbose=True,
         )
+
