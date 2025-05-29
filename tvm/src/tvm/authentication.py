@@ -7,7 +7,7 @@ from typing import Optional
 from datetime import datetime, timedelta
 import os
 import secrets
-from tvm.models import User, RefreshToken, RefreshTokenRequest
+from models import User, RefreshToken, RefreshTokenRequest
 from main import get_db
 
 SECRET_KEY = os.environ.get("SECRET")
@@ -156,8 +156,11 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 from main import app, get_db
 
 
-@app.post("/token")
+@app.post("/token", tags=["Authentication"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    Login with username and password to get access token and refresh token
+    """
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
@@ -173,8 +176,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     }
 
 
-@app.post("/token/refresh")
+@app.post("/token/refresh", tags=["Authentication"])
 async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    """
+    Refresh access token using refresh token
+    """
     user = verify_refresh_token(db, request.refresh_token)
     if not user:
         raise HTTPException(
@@ -196,21 +202,30 @@ async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depen
     }
 
 
-@app.post("/token/revoke")
+@app.post("/token/revoke", tags=["Authentication"])
 async def revoke_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    """
+    Revoke refresh token
+    """
     revoke_refresh_token(db, request.refresh_token)
     return {"message": "Token revoked successfully"}
 
 
-@app.post("/logout")
+@app.post("/logout", tags=["Authentication"])
 async def logout(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """
+    Logout and revoke all refresh tokens
+    """
     deleted_count = revoke_all_user_tokens(db, current_user.id)
     return {"message": f"Logged out successfully. Removed {deleted_count} tokens."}
 
 
-@app.post("/users/")
+@app.post("/users/", tags=["Authentication"])
 def create_user(username: str, password: str, role: str = "user", db: Session = Depends(get_db),
                 admin: User = Depends(get_current_admin_user)):
+    """
+    Create a new user based on username and password
+    """
     user = db.query(User).filter(User.username == username).first()
     if user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -222,12 +237,18 @@ def create_user(username: str, password: str, role: str = "user", db: Session = 
     return {"username": new_user.username, "role": new_user.role}
 
 
-@app.get("/me")
+@app.get("/me", tags=["Authentication"])
 def read_users_me(current_user: User = Depends(get_current_user)):
+    """
+    Returns username and role
+    """
     return {"username": current_user.username, "role": current_user.role}
 
 
-@app.get("/verify-token/{token}")
+@app.get("/verify-token/{token}", tags=["Authentication"])
 async def verify_user_token(token: str):
+    """
+    Verify access token
+    """
     verify_token(token=token)
     return {"message": "Token is valid"}

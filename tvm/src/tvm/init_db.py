@@ -1,10 +1,12 @@
 import json
-from tvm.models import Category, SubCategory, AdvisoryText
+from models import Category, SubCategory, AdvisoryText
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+import os
 
 # uses knowledge/templates.json to seed the database with data in absence of a front-end.
-engine = create_engine("mysql+pymysql://root:@localhost:3306/tvm")
+
+engine = create_engine(os.getenv("SQL_CONNECTION"))
 Session = sessionmaker(bind=engine)
 session = Session()
 
