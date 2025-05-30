@@ -278,13 +278,19 @@ rewrite_task_customer_declines_advice:
     Een korte, afsluitende standaardtekst in het Nederlands.
   agent: writer
 
+retrieve_template:
+  description: >
+    Op basis van het uitgevoerde onderzoek, haal de juiste template op uit de database en vul dit in.
+  expected_output: >
+    Geef een ingevuld template terug zonder gaten.
+  agent: writer
 
 research:
   description: >
     Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
   expected_output: >
     Inventaris
-    Risico tot minimum beperken of niet
+    Welk soort advies
     Eigen risico
     Verzekerd bedrag
     Advies wordt opgevolgd

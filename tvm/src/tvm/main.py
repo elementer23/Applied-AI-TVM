@@ -5,9 +5,31 @@ from fastapi import FastAPI
 from models import Base, InputData
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
 
 from starlette.middleware.cors import CORSMiddleware
+from sqlalchemy.engine.url import make_url
+import embedchain.loaders.mysql as mysql_loader_module
 
+_original_init = mysql_loader_module.MySQLLoader.__init__
+
+
+def patched_init(self, config):
+    url = config.get("url")
+    if url:
+        parsed_url = make_url(url)
+        config = {
+            "host": parsed_url.host,
+            "user": parsed_url.username,
+            "password": parsed_url.password,
+            "port": parsed_url.port,
+            "database": parsed_url.database,
+        }
+
+    _original_init(self, config)
+
+
+mysql_loader_module.MySQLLoader.__init__ = patched_init
 from crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
@@ -25,6 +47,10 @@ tags_metadata = [
     {
         "name": "Chat",
         "description": "All endpoints for managing conversations and messages",
+    },
+    {
+        "name": "Advisory Texts",
+        "description": "All endpoints for managing the advisory text templates."
     }
 ]
 
@@ -32,8 +58,8 @@ app = FastAPI(openapi_tags=tags_metadata,
               title="TVM AI",
               version="0.0.1",)
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./db.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SQLALCHEMY_DATABASE_URL = os.getenv("SQL_CONNECTION")
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
@@ -47,6 +73,7 @@ def get_db():
 
 from authentication import *
 from chat import *
+from advisory_texts import *
 
 app.add_middleware(
     CORSMiddleware,
