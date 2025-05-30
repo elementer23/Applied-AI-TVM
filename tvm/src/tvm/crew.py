@@ -15,16 +15,17 @@ sql_search = MySQLSearchTool(
         llm=dict(
             provider="openai", # or google, openai, anthropic, llama2, ...
             config=dict(
-                model="gpt-4.1-mini",
+                model="mistral-ai/mistral-medium-2505",
                 # temperature=0.5,
                 # top_p=1,
                 # stream=true,
             ),
         ),
         embedder=dict(
-            provider="openai",
+            provider="google",
             config=dict(
-                model="text-embedding-3-small",  # newer, faster, cheaper
+                model="models/embedding-001",
+                task_type="retrieval_document",
             )
         )
     )
@@ -57,6 +58,13 @@ class Tvm():
         return Task(
             config=self.tasks_config['research'],
             agent=self.reader()
+        )
+
+    def manager(self) -> Agent:
+        return Agent(
+            config=self.agents_config['manager'],
+            verbose=True,
+            allow_delegation=True,
         )
 
     # @task
@@ -156,6 +164,8 @@ class Tvm():
     
                 Use the following query format:
                 "category = CATEGORY_NAME_HERE and sub_category = SUBCATEGORY_NAME_HERE"
+                
+                The text column in the table is the template you need.
     
                 Only use the tool. Do not attempt to answer without it.
                 """,
@@ -191,7 +201,8 @@ class Tvm():
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
-            process=Process.sequential,
+            process=Process.hierarchical,
             verbose=True,
+            manager_agent=self.manager()
         )
 
