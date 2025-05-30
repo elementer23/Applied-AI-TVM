@@ -2,33 +2,12 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict, Any
-from crewai_tools import MySQLSearchTool
 import os
+import json
 
 from dotenv import load_dotenv
+from tools.db_tool import advisory_db_tool
 
-load_dotenv(dotenv_path="../../.env")
-sql_search = MySQLSearchTool(
-    db_uri = os.getenv("SQL_CONNECTION"),
-    table_name='advisory_texts',
-    config=dict(
-        llm=dict(
-            provider="openai", # or google, openai, anthropic, llama2, ...
-            config=dict(
-                model="gpt-4.1-mini",
-                # temperature=0.5,
-                # top_p=1,
-                # stream=true,
-            ),
-        ),
-        embedder=dict(
-            provider="openai",
-            config=dict(
-                model="text-embedding-3-small",  # newer, faster, cheaper
-            )
-        )
-    )
-)
 
 @CrewBase
 class Tvm():
@@ -49,7 +28,30 @@ class Tvm():
         return Agent(
             config=self.agents_config['writer'],
             verbose=True,
-            tools=[sql_search],
+        )
+
+    @agent
+    def db_specialist(self) -> Agent:
+        """Gespecialiseerde agent voor database operaties"""
+        return Agent(
+            role="Database Specialist",
+            goal="Retrieve exact advisory text templates from the advisory_texts table using category and sub_category fields",
+            backstory="""You are an expert at database operations. You work with the advisory_texts table which has these exact columns:
+            - id (Integer, primary key)
+            - category (String 255)
+            - sub_category (String 255) 
+            - text (Text)
+
+            You always retrieve the actual text content from the database, never SQL statements. You understand this table structure perfectly.""",
+            verbose=True,
+            tools=[advisory_db_tool],
+        )
+
+    def manager(self) -> Agent:
+        return Agent(
+            config=self.agents_config['manager'],
+            verbose=True,
+            allow_delegation=True,
         )
 
     @task
@@ -59,91 +61,35 @@ class Tvm():
             agent=self.reader()
         )
 
-    # @task
-    # def decide_and_execute_rewrite(self) -> Task:
-    #
-    #     rewrite_configs = {
-    #         'minrisk_damage_to_third_parties': self.tasks_config['rewrite_task_minrisk_damage_to_third_parties'],
-    #         'risk_in_euros_damage_to_third_parties': self.tasks_config[
-    #             'rewrite_task_risk_in_euros_damage_to_third_parties'],
-    #         'deviate_from_identification_damage_to_third_parties': self.tasks_config[
-    #             'rewrite_task_deviate_from_identification_damage_to_third_parties'],
-    #         'identify_by_risk_damage_to_third_parties': self.tasks_config[
-    #             'rewrite_task_identify_by_risk_damage_to_third_parties'],
-    #         'minrisk_damage_by_standstill': self.tasks_config['rewrite_task_minrisk_damage_by_standstill'],
-    #         'risk_in_euros_damage_by_standstill': self.tasks_config['rewrite_task_risk_in_euros_damage_by_standstill'],
-    #         'deviate_from_identification_damage_by_standstill': self.tasks_config[
-    #             'rewrite_task_deviate_from_identification_damage_by_standstill'],
-    #         'identify_by_risk_damage_by_standstill': self.tasks_config[
-    #             'rewrite_task_identify_by_risk_damage_by_standstill'],
-    #         'minrisk_loss_of_personal_items': self.tasks_config['rewrite_task_minrisk_loss_of_personal_items'],
-    #         'risk_in_euros_loss_of_personal_items': self.tasks_config[
-    #             'rewrite_task_risk_in_euros_loss_of_personal_items'],
-    #         'deviate_from_identification_loss_of_personal_items': self.tasks_config[
-    #             'rewrite_task_deviate_from_identification_loss_of_personal_items'],
-    #         'identify_by_risk_loss_of_personal_items': self.tasks_config[
-    #             'rewrite_task_identify_by_risk_loss_of_personal_items'],
-    #         'minrisk_damage_to_passengers': self.tasks_config['rewrite_task_minrisk_damage_to_passengers'],
-    #         'risk_in_euros_damage_to_passengers': self.tasks_config['rewrite_task_risk_in_euros_damage_to_passengers'],
-    #         'deviate_from_identification_damage_to_passengers': self.tasks_config[
-    #             'rewrite_task_deviate_from_identification_damage_to_passengers'],
-    #         'identify_by_risk_damage_to_passengers': self.tasks_config[
-    #             'rewrite_task_identify_by_risk_damage_to_passengers'],
-    #         'customer_declines_advice': self.tasks_config['rewrite_task_customer_declines_advice'],
-    #     }
-    #
-    #     combined_description = f"""
-    #     Based on the research results, analyze the client's needs and determine which ONE rewrite task to execute, then execute it.
-    #
-    #     STEP 1: DECISION LOGIC
-    #     - If client wants to minimize ALL risks + third party damage → select minrisk_damage_to_third_parties
-    #     - If client has euro risk tolerance + third party damage → select risk_in_euros_damage_to_third_parties
-    #     - If client wants higher risk than assessed + third party damage → select deviate_from_identification_damage_to_third_parties
-    #     - If client wants per-risk assessment + third party damage → select identify_by_risk_damage_to_third_parties
-    #     - If client wants to minimize ALL risks + standstill → select minrisk_damage_by_standstill
-    #     - If client has euro risk tolerance + standstill → select risk_in_euros_damage_by_standstill
-    #     - If client wants higher risk than assessed + standstill → select deviate_from_identification_damage_by_standstill
-    #     - If client wants per-risk assessment + standstill → select identify_by_risk_damage_by_standstill
-    #     - If client wants to minimize ALL risks + personal items → select minrisk_loss_of_personal_items
-    #     - If client has euro risk tolerance + personal items → select risk_in_euros_loss_of_personal_items
-    #     - If client wants higher risk than assessed + personal items → select deviate_from_identification_loss_of_personal_items
-    #     - If client wants per-risk assessment + personal items → select identify_by_risk_loss_of_personal_items
-    #     - If client wants to minimize ALL risks + passengers → select minrisk_damage_to_passengers
-    #     - If client has euro risk tolerance + passengers → select risk_in_euros_damage_to_passengers
-    #     - If client wants higher risk than assessed + passengers → select deviate_from_identification_damage_to_passengers
-    #     - If client wants per-risk assessment + passengers → select identify_by_risk_damage_to_passengers
-    #     - If client explicitly declines advice → select customer_declines_advice
-    #
-    #     STEP 2: EXECUTE THE SELECTED TASK
-    #     Once you determine which task to use, execute it exactly according to its specific instructions:
-    #
-    #     Available tasks and their instructions:
-    #     """
-    #
-    #     for task_name, config in rewrite_configs.items():
-    #         combined_description += f"\n\n**{task_name}:**\n{config['description']}\n"
-    #
-    #     return Task(
-    #         description=combined_description,
-    #         expected_output="Een complete Nederlandse alinea volgens de geselecteerde rewrite task, met alle parameters correct ingevuld uit de research data.",
-    #         agent=self.writer(),
-    #         context=[self.research()]
-    #     )
     @task
     def decide_template_category(self) -> Task:
         return Task(
             description="""
                 Analyze the research context to determine which advisory text best fits the client's needs.
-    
-                You must choose a CATEGORY and SUBCATEGORY based on their request. Do not fabricate.
-    
-                Output exactly this JSON format:
+
+                Based on the advisory_texts table structure, choose the appropriate:
+
+                CATEGORY options:
+                - damage_to_third_parties
+                - damage_by_standstill  
+                - loss_of_personal_items
+                - damage_to_passengers
+
+                SUB_CATEGORY options:
+                - minrisk
+                - risk_in_euros
+                - deviate_from_identification
+                - identify_by_risk
+
+                Output EXACTLY this JSON format with exact field names:
                 {
-                    "category": "CATEGORY_NAME_HERE",
-                    "sub_category": "SUBCATEGORY_NAME_HERE"
+                    "category": "exact_category_name",
+                    "sub_category": "exact_sub_category_name"
                 }
+
+                Make sure the values match exactly what exists in the database.
                 """,
-            expected_output="A JSON with 'category' and 'sub_category' fields.",
+            expected_output="A JSON object with 'category' and 'sub_category' fields containing exact database values.",
             agent=self.reader(),
             context=[self.research()]
         )
@@ -152,16 +98,24 @@ class Tvm():
     def fetch_template_from_db(self) -> Task:
         return Task(
             description="""
-                Use the `sql_search` tool to retrieve the advisory text from the database using the category and subcategory provided.
-    
-                Use the following query format:
-                "category = CATEGORY_NAME_HERE and sub_category = SUBCATEGORY_NAME_HERE"
-    
-                Only use the tool. Do not attempt to answer without it.
+                Use the Advisory Database Tool to retrieve the ACTUAL advisory text from the advisory_texts table.
+
+                STEP-BY-STEP PROCESS:
+                1. Parse the JSON from the previous task to extract category and sub_category
+                2. Use the Advisory Database Tool with these EXACT parameters
+                3. The tool will query: SELECT text FROM advisory_texts WHERE category = ? AND sub_category = ?
+                4. Return the complete text content from the database
+
+                CRITICAL: 
+                - You MUST return the actual text content, not SQL statements
+                - If no exact match found, the tool will show available alternatives
+                - Handle any partial matches appropriately
+
+                Example tool call:
+                Advisory Database Tool(category="damage_to_third_parties", sub_category="minrisk")
                 """,
-            expected_output="The advisory template text from the database.",
-            tools=[sql_search],
-            agent=self.reader(),
+            expected_output="The complete Dutch advisory text template from the advisory_texts.text column. This must be actual text content that can be used as a template.",
+            agent=self.db_specialist(),
             context=[self.decide_template_category()]
         )
 
@@ -169,21 +123,32 @@ class Tvm():
     def fill_in_template(self) -> Task:
         return Task(
             description="""
-                Fill in the advisory template using the research information. Ensure proper Dutch grammar and that all variables are replaced appropriately.
-    
-                Use only the template provided in context. Do not add other suggestions.
+                Fill in the advisory template with specific information from the research context.
+
+                PROCESS:
+                1. Take the template text retrieved from the database
+                2. Look for placeholder variables (marked as '[variable_name]') and replace them with the appropriate value.
+                3. Areas in parenthesis '()' are a choice, the options being seperated by a '/' character. You must keep ONLY the text before OR after the slash within the area in parenthesis.
+                4. Replace placeholders with appropriate values from research context
+                5. Ensure proper Dutch grammar and sentence structure
+                6. Maintain the original template format and structure
+
+                If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
+                
+                CRITICAL:
+                - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
+                - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
+                - if [volgt_advies_op] is false, replace with: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
+                REQUIREMENTS:
+                - Output must be in Dutch
+                - Must use the database template as the foundation
+                - All placeholders must be replaced with realistic values
+                - Grammar and spelling must be correct
                 """,
-            expected_output="Een herschreven advies in het Nederlands, op basis van het gegeven sjabloon.",
+            expected_output="Een volledig ingevuld Nederlands adviessjabloon, gebaseerd op de database template, met alle variabelen vervangen door relevante informatie uit de research context.",
             agent=self.writer(),
             context=[self.research(), self.fetch_template_from_db()]
         )
-
-    # @task
-    # def rewrite_task_eigenrisico(self) -> Task:
-    #     return Task(
-    #         config=self.tasks_config['rewrite_task_eigenrisico'], # type: ignore[index]
-    #     )
-
 
     @crew
     def crew(self) -> Crew:
@@ -191,7 +156,7 @@ class Tvm():
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
-            process=Process.sequential,
+            process=Process.hierarchical,
             verbose=True,
+            manager_agent=self.manager()
         )
-
