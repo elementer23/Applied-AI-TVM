@@ -128,13 +128,17 @@ class Tvm():
                 PROCESS:
                 1. Take the template text retrieved from the database
                 2. Look for placeholder variables (marked as '[variable_name]') and replace them with the appropriate value.
-                3. areas in parenthesis are a choice, the options being seperated by a '/'. Leave only the correct part (usually decided by if you can fill the parameter)
+                3. Areas in parenthesis '()' are a choice, the options being seperated by a '/' character. You must keep ONLY the text before OR after the slash within the area in parenthesis.
                 4. Replace placeholders with appropriate values from research context
                 5. Ensure proper Dutch grammar and sentence structure
                 6. Maintain the original template format and structure
 
                 If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
-
+                
+                CRITICAL:
+                - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
+                - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
+                - if [volgt_advies_op] is false, replace with: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
                 REQUIREMENTS:
                 - Output must be in Dutch
                 - Must use the database template as the foundation
