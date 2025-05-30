@@ -22,9 +22,9 @@ sql_search = MySQLSearchTool(
             ),
         ),
         embedder=dict(
-            provider="openai",
+            provider="google",
             config=dict(
-                model="text-embedding-3-small",  # newer, faster, cheaper
+                model="models/text-embedding-004"
             )
         )
     )
