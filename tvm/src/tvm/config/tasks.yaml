@@ -298,3 +298,17 @@ research:
     Overige context
   agent: reader
 
+fetch_template_from_db:
+  description: >
+    Retrieve the actual advisory text template from the database.
+    
+    CRITICAL: Return the TEXT CONTENT, not SQL statements.
+    
+    Steps:
+    1. Use the category and subcategory identified in previous task
+    2. Query the database for matching advisory text
+    3. Return the complete text from the 'text' column
+    
+    Do not return SQL queries - return the actual advisory text content.
+  expected_output: >
+    The complete Dutch advisory text template from the database.
