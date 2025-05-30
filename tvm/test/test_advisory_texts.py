@@ -1,5 +1,3 @@
-from tvm.text_endpoints import *
-
 from test_main import client
 
 # Gets all advice texts

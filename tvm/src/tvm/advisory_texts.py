@@ -1,16 +1,14 @@
-from main import app, get_db
-from authentication import *
-from models import *
 from fastapi import Depends, HTTPException, status, Response
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from datetime import datetime
+from main import app, get_db
+from models import *
+from authentication import get_current_user
+from typing import List
+
 
 # Gets all advice texts
-@app.get("/advisorytexts/")
-def read_texts(db: Session = Depends(get_db)):
+@app.get("/advisorytexts/", response_model=List[AdvisoryTextResponse], tags=["Advisory Texts"])
+def read_texts(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Gets all advisory texts templates.
     """
@@ -20,8 +18,8 @@ def read_texts(db: Session = Depends(get_db)):
     return advisorytexts
 
 # Gets the advice text with the given composite ID's
-@app.get("/advisorytexts/id={text_id}")
-def read_text(text_id: int, db: Session = Depends(get_db)):
+@app.get("/advisorytexts/id={text_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
+def read_text(text_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Gets a specific advisory text template for a given ID.
     """
@@ -31,7 +29,7 @@ def read_text(text_id: int, db: Session = Depends(get_db)):
     return advisorytext
 
 # Create new advice text
-@app.post("/advisorytexts/")
+@app.post("/advisorytexts/", tags=["Advisory Texts"])
 def create_text(advice_text: str, category: str, subcategory: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Creates a new advisory text template.
@@ -49,7 +47,7 @@ def create_text(advice_text: str, category: str, subcategory: str, db: Session =
         raise HTTPException(status_code=403, detail="You are not allowed to create an advisory text.")
 
 # Edits the advice text with the given ID
-@app.put("/advisorytexts/id={text_id}")
+@app.put("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
 def update_text(text_id: int, advice_text: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Updates an existing advisory text template for a given ID.
@@ -66,7 +64,7 @@ def update_text(text_id: int, advice_text: str, db: Session = Depends(get_db), c
         raise HTTPException(status_code=403, detail="You are not allowed to update an advisory text.")
 
 # Deletes the advice text with the given ID
-@app.delete("/advisorytexts/id={text_id}")
+@app.delete("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
 def delete_text(text_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Deletes a specific advisory text template for a given ID.

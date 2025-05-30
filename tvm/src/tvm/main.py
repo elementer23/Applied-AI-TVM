@@ -47,6 +47,10 @@ tags_metadata = [
     {
         "name": "Chat",
         "description": "All endpoints for managing conversations and messages",
+    },
+    {
+        "name": "Advisory Texts",
+        "description": "All endpoints for managing the advisory text templates."
     }
 ]
 
@@ -69,6 +73,7 @@ def get_db():
 
 from authentication import *
 from chat import *
+from advisory_texts import *
 
 app.add_middleware(
     CORSMiddleware,

@@ -83,3 +83,10 @@ class MessageResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class AdvisoryTextResponse(BaseModel):
+    id: int
+    category: str
+    sub_category: str
+    text: str
