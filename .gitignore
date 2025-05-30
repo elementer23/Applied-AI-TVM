@@ -173,3 +173,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 tvm/src/tvm/db.db
+/tvm/src/tvm/db
