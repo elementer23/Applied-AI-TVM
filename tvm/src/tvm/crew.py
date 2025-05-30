@@ -127,10 +127,11 @@ class Tvm():
 
                 PROCESS:
                 1. Take the template text retrieved from the database
-                2. Look for placeholder variables like [VARIABLE_NAME], or similar patterns
-                3. Replace placeholders with appropriate values from research context
-                4. Ensure proper Dutch grammar and sentence structure
-                5. Maintain the original template format and structure
+                2. Look for placeholder variables (marked as '[variable_name]') and replace them with the appropriate value.
+                3. areas in parenthesis are a choice, the options being seperated by a '/'. Leave only the correct part (usually decided by if you can fill the parameter)
+                4. Replace placeholders with appropriate values from research context
+                5. Ensure proper Dutch grammar and sentence structure
+                6. Maintain the original template format and structure
 
                 If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
 
