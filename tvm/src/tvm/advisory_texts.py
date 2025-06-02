@@ -38,11 +38,11 @@ def create_category(category_name: str, db: Session = Depends(get_db), current_u
         category = db.get(Category, category_name)
         if category:
             raise HTTPException(status_code=400, detail="This category already exists.")
-        new_category = Category(text=category_name)
+        new_category = Category(name=category_name)
         db.add(new_category)
         db.commit()
         db.refresh(new_category)
-        return Response(status_code=201, content=f"Category {new_category.text} successfully created.")
+        return Response(status_code=201, content=f"Category {new_category.name} successfully created.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to create a category.")
 
@@ -56,7 +56,7 @@ def update_category(category_id: int, category_name: str, db: Session = Depends(
         category = db.get(Category, category_id)
         if not category:
             return HTTPException(status_code=404, detail="Category not found.")
-        setattr(category, Category.text, category_name)
+        setattr(category, Category.name, category_name)
         db.commit()
         db.refresh(category)
         return Response(status_code=200, content=f"Category {category_name} successfully updated.")
@@ -112,11 +112,11 @@ def create_subcategory(subcategory_name: str, db: Session = Depends(get_db), cur
         subcategory = db.query(SubCategory).filter(SubCategory.name == subcategory_name).first()
         if subcategory:
             raise HTTPException(status_code=400, detail="This subcategory already exists.")
-        new_subcategory = SubCategory(text=subcategory_name)
+        new_subcategory = SubCategory(name=subcategory_name)
         db.add(new_subcategory)
         db.commit()
         db.refresh(new_subcategory)
-        return Response(status_code=201, content=f"Subcategory {subcategory_name} successfully created.")
+        return Response(status_code=201, content=f"Subcategory {new_subcategory.name} successfully created.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
 
@@ -130,7 +130,7 @@ def update_subcategory(subcategory_id: int, subcategory_name: str, db: Session =
         subcategory = db.get(SubCategory, subcategory_id)
         if not subcategory:
             return HTTPException(status_code=404, detail="Subcategory not found.")
-        setattr(subcategory, SubCategory.text, subcategory_name)
+        setattr(subcategory, SubCategory.name, subcategory_name)
         db.commit()
         db.refresh(subcategory)
         return Response(status_code=200, content=f"Subcategory {subcategory_name} successfully updated.")
@@ -153,9 +153,6 @@ def delete_category(subcategory_id: int, db: Session = Depends(get_db), current_
         return Response(status_code=204, content=f"Subcategory {subcategory} successfully deleted.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete a subcategory.")
-
-
-
 
 # Gets all advice texts
 @app.get("/advisorytexts/", response_model=List[AdvisoryTextResponse], tags=["Advisory Texts"])
