@@ -7,7 +7,7 @@ from typing import Optional
 from datetime import datetime, timedelta
 import os
 import secrets
-from models import User, RefreshToken, RefreshTokenRequest
+from models import User, RefreshToken, RefreshTokenRequest, UserResponse, UserUpdateRequest
 from main import get_db
 
 SECRET_KEY = os.environ.get("SECRET")
@@ -252,3 +252,65 @@ async def verify_user_token(token: str):
     """
     verify_token(token=token)
     return {"message": "Token is valid"}
+
+
+@app.get("/users/", tags=["Authentication"], response_model=list[UserResponse])
+def list_users(db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+    """
+    List all users
+    """
+    users = db.query(User).all()
+    return users
+
+
+@app.put("/users/{user_id}", tags=["Authentication"], response_model=UserResponse)
+def update_user(user_id: int, user_update: UserUpdateRequest, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+    """
+    Update user by ID
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if username is being changed and if it's already taken
+    if user_update.username and user_update.username != user.username:
+        existing_user = db.query(User).filter(User.username == user_update.username).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        user.username = user_update.username
+
+    # Update password if provided
+    if user_update.password:
+        user.hashed_password = get_password_hash(user_update.password)
+        revoke_all_user_tokens(db, user.id)
+
+    # Update role if provided
+    if user_update.role:
+        user.role = user_update.role
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@app.delete("/users/{user_id}", tags=["Authentication"])
+def delete_user(user_id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+    """
+    Delete user by ID
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Prevent admin from deleting themselves
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+
+    # Revoke all refresh tokens before deletion
+    revoke_all_user_tokens(db, user.id)
+
+    # Delete the user
+    db.delete(user)
+    db.commit()
+
+    return {"message": f"User '{user.username}' deleted successfully"}
