@@ -46,8 +46,10 @@ class Category(Base):
 class SubCategory(Base):
     __tablename__ = "sub_categories"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    category = Column(Integer, ForeignKey("categories.id"), index=True, nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"), index=True, nullable=False)
     name = Column(String(255), nullable=False)
+
+    category = relationship("Category", back_populates="subcategories")
 
 
 class Conversation(Base):

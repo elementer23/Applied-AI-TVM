@@ -23,6 +23,7 @@ for cat in data["categories"]:
     if not existing_category:
         category = Category(name=cat["name"])
         session.add(category)
+        session.flush()  # This ensures the ID is assigned before we use it
         category_objects[cat["name"]] = category
     else:
         category_objects[cat["name"]] = existing_category
@@ -35,12 +36,12 @@ for cat_name, category_obj in category_objects.items():
         # Check if this specific subcategory already exists for this category
         existing_subcategory = session.query(SubCategory).filter_by(
             name=subcat["name"],
-            category=category_obj.id
+            category_id=category_obj.id
         ).first()
         if not existing_subcategory:
             subcategory = SubCategory(
                 name=subcat["name"],
-                category=category_obj.id
+                category_id=category_obj.id
             )
             session.add(subcategory)
 
