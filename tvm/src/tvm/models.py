@@ -132,3 +132,19 @@ class SubCategoryResponse(BaseModel):
 
 class SubCategoryModel(BaseModel):
     name: str
+
+      
+class UserUpdateRequest(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+    role: Optional[str] = None
+
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    role: str
+
+    class Config:
+        from_attributes = True
+
