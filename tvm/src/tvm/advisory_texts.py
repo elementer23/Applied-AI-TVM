@@ -7,8 +7,10 @@ from typing import List
 
 
 # Get all categories
-@app.get("/categories/")
-def read_categories(db: Session = Depends(get_db)):
+@app.get("/categories/", response_model=List[CategoryResponse], tags=["Advisory Texts"])
+def read_categories(
+        db: Session = Depends(get_db)
+):
     """
     Get all categories of risks.
     """
@@ -18,8 +20,11 @@ def read_categories(db: Session = Depends(get_db)):
     return categories
 
 # Get the category with the given ID
-@app.get("/categories/{category_id}")
-def read_category(category_id: int, db: Session = Depends(get_db)):
+@app.get("/categories/{category_id}", response_model=CategoryResponse, tags=["Advisory Texts"])
+def read_category(
+        category_id: int,
+        db: Session = Depends(get_db)
+):
     """
     Get a specific category of risk for the given ID.
     """
@@ -29,16 +34,20 @@ def read_category(category_id: int, db: Session = Depends(get_db)):
     return category
 
 # Create a new category
-@app.post("/categories/")
-def create_category(category_name: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@app.post("/categories/", tags=["Advisory Texts"])
+def create_category(
+        category_create: CategoryModel,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Create a new category of risk.
     """
     if current_user.role == "admin":
-        category = db.get(Category, category_name)
+        category = db.get(Category, category_create.name)
         if category:
             raise HTTPException(status_code=400, detail="This category already exists.")
-        new_category = Category(name=category_name)
+        new_category = Category(name=category_create.name)
         db.add(new_category)
         db.commit()
         db.refresh(new_category)
@@ -47,8 +56,13 @@ def create_category(category_name: str, db: Session = Depends(get_db), current_u
         raise HTTPException(status_code=403, detail="You are not allowed to create a category.")
 
 # Update the category with the given ID
-@app.put("/categories/{category_id}")
-def update_category(category_id: int, category_name: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@app.put("/categories/{category_id}", tags=["Advisory Texts"])
+def update_category(
+        category_id: int,
+        category_update: CategoryModel,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Update a specific category of risk for the given ID.
     """
@@ -56,16 +70,20 @@ def update_category(category_id: int, category_name: str, db: Session = Depends(
         category = db.get(Category, category_id)
         if not category:
             return HTTPException(status_code=404, detail="Category not found.")
-        setattr(category, Category.name, category_name)
+        category.name = category_update.name
         db.commit()
         db.refresh(category)
-        return Response(status_code=200, content=f"Category {category_name} successfully updated.")
+        return Response(status_code=200, content=f"Category {category.name} successfully updated.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to update a category.")
 
 # Delete the category with the given ID
-@app.delete("/categories/{category_id}")
-def delete_category(category_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@app.delete("/categories/{category_id}", tags=["Advisory Texts"])
+def delete_category(
+        category_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Delete the category of risk corresponding to the given ID.
     """
@@ -81,8 +99,10 @@ def delete_category(category_id: int, db: Session = Depends(get_db), current_use
         raise HTTPException(status_code=403, detail="You are not allowed to delete a category.")
 
 # Get all subcategories
-@app.get("/subcategories/")
-def read_subcategories(db: Session = Depends(get_db)):
+@app.get("/subcategories/", response_model=List[SubCategoryResponse], tags=["Advisory Texts"])
+def read_subcategories(
+        db: Session = Depends(get_db)
+):
     """
     Gets all subcategories of risk willingness.
     """
@@ -92,8 +112,11 @@ def read_subcategories(db: Session = Depends(get_db)):
     return subcategories
 
 # Get the subcategory with the given ID
-@app.get("/subcategories/{subcategory_id}")
-def read_subcategory(subcategory_id: int, db: Session = Depends(get_db)):
+@app.get("/subcategories/{subcategory_id}", response_model=SubCategoryResponse, tags=["Advisory Texts"])
+def read_subcategory(
+        subcategory_id: int,
+        db: Session = Depends(get_db)
+):
     """
     Gets a specific subcategory of risk willingness corresponding to the given ID.
     """
@@ -102,27 +125,36 @@ def read_subcategory(subcategory_id: int, db: Session = Depends(get_db)):
         return HTTPException(status_code=404, detail="Subcategory not found.")
     return subcategory
 
-# Create a new subcategory
-@app.post("/subcategories/")
-def create_subcategory(subcategory_name: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    """
-    Creates a new subcategory of risk willingness.
-    """
-    if current_user.role == "admin":
-        subcategory = db.query(SubCategory).filter(SubCategory.name == subcategory_name).first()
-        if subcategory:
-            raise HTTPException(status_code=400, detail="This subcategory already exists.")
-        new_subcategory = SubCategory(name=subcategory_name)
-        db.add(new_subcategory)
-        db.commit()
-        db.refresh(new_subcategory)
-        return Response(status_code=201, content=f"Subcategory {new_subcategory.name} successfully created.")
-    else:
-        raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
+# Create a new subcategory (Currently disabled, as it isn't supposed to be used)
+# @app.post("/subcategories/", tags=["Advisory Texts"])
+# def create_subcategory(
+#         subcategory_create: SubCategoryModel,
+#         db: Session = Depends(get_db),
+#         current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     Creates a new subcategory of risk willingness.
+#     """
+#     if current_user.role == "admin":
+#         subcategory = db.get(SubCategory, subcategory_create.name)
+#         if subcategory:
+#             raise HTTPException(status_code=400, detail="This subcategory already exists.")
+#         new_subcategory = SubCategory(name=subcategory_create.name)
+#         db.add(new_subcategory)
+#         db.commit()
+#         db.refresh(new_subcategory)
+#         return Response(status_code=201, content=f"Subcategory {new_subcategory.name} successfully created.")
+#     else:
+#         raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
 
 # Update the subcategory with the given ID
-@app.put("/subcategories/{subcategory_id}")
-def update_subcategory(subcategory_id: int, subcategory_name: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@app.put("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
+def update_subcategory(
+        subcategory_id: int,
+        subcategory_update: SubCategoryModel,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Update a specific subcategory of risk willingness for the given ID.
     """
@@ -130,16 +162,20 @@ def update_subcategory(subcategory_id: int, subcategory_name: str, db: Session =
         subcategory = db.get(SubCategory, subcategory_id)
         if not subcategory:
             return HTTPException(status_code=404, detail="Subcategory not found.")
-        setattr(subcategory, SubCategory.name, subcategory_name)
+        subcategory.name = subcategory_update.name
         db.commit()
         db.refresh(subcategory)
-        return Response(status_code=200, content=f"Subcategory {subcategory_name} successfully updated.")
+        return Response(status_code=200, content=f"Subcategory {subcategory.name} successfully updated.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to update a subcategory.")
 
 # Delete the subcategory with the given ID
-@app.delete("/subcategories/{subcategory_id}")
-def delete_category(subcategory_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@app.delete("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
+def delete_category(
+        subcategory_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Delete the subcategory of risk willingness corresponding to the given ID.
     """
@@ -156,7 +192,9 @@ def delete_category(subcategory_id: int, db: Session = Depends(get_db), current_
 
 # Gets all advice texts
 @app.get("/advisorytexts/", response_model=List[AdvisoryTextResponse], tags=["Advisory Texts"])
-def read_texts(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def read_texts(
+        db: Session = Depends(get_db)
+):
     """
     Gets all advisory texts templates.
     """
@@ -167,7 +205,10 @@ def read_texts(current_user: User = Depends(get_current_user), db: Session = Dep
 
 # Gets the advice text with the given composite ID's
 @app.get("/advisorytexts/id={text_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
-def read_text(text_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def read_text(
+        text_id: int,
+        db: Session = Depends(get_db)
+):
     """
     Gets a specific advisory text template for a given ID.
     """
@@ -178,25 +219,38 @@ def read_text(text_id: int, current_user: User = Depends(get_current_user), db: 
 
 # Create new advice text
 @app.post("/advisorytexts/", tags=["Advisory Texts"])
-def create_text(advice_text: str, category: str, subcategory: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_text(
+        advisory_text_create: AdvisoryTextModel,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Creates a new advisory text template.
     """
     if current_user.role == "admin":
-        advice = db.query(AdvisoryText).filter(AdvisoryText.text == advice_text).first()
+        advice = db.query(AdvisoryText).filter(AdvisoryText.text == advisory_text_create.text).first()
+        category = db.query(Category).filter(Category.id == advisory_text_create.category_id).first()
         if advice:
             raise HTTPException(status_code=400, detail="This text already exists.")
-        new_advice = AdvisoryText(text=advice_text, category=category, sub_category=subcategory)
+        new_advice = AdvisoryText(text=advisory_text_create.text, category=category.name, sub_category=advisory_text_create.sub_category)
+        new_subcategory = SubCategory(name=advisory_text_create.sub_category, category_id=category.id)
         db.add(new_advice)
+        db.add(new_subcategory)
         db.commit()
         db.refresh(new_advice)
+        db.refresh(new_subcategory)
         return Response(status_code=201, content=f"AdvisoryText {new_advice.text} successfully created.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to create an advisory text.")
 
 # Edits the advice text with the given ID
 @app.put("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
-def update_text(text_id: int, advice_text: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_text(
+        text_id: int,
+        advisory_text_update: AdvisoryTextModel,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Updates an existing advisory text template for a given ID.
     """
@@ -204,16 +258,20 @@ def update_text(text_id: int, advice_text: str, db: Session = Depends(get_db), c
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
             return HTTPException(status_code=404, detail="Advice text not found.")
-        setattr(advisorytext, AdvisoryText.text, advice_text)
+        advisorytext.text = advisory_text_update.text
         db.commit()
         db.refresh(advisorytext)
-        return Response(status_code=200, content=f"Advisory Text {advice_text} successfully updated.")
+        return Response(status_code=200, content=f"Advisory Text {advisorytext.text} successfully updated.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to update an advisory text.")
 
 # Deletes the advice text with the given ID
 @app.delete("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
-def delete_text(text_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def delete_text(
+        text_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     """
     Deletes a specific advisory text template for a given ID.
     """
