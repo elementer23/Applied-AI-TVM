@@ -7,7 +7,10 @@ def test_read_categories():
     assert response.status_code == 200
 
     expected_data = [
-        # Fill this in with the expected results in the database
+        {"id": 2, "name": "damage_by_standstill"},
+        {"id": 4, "name": "damage_to_passengers"},
+        {"id": 1, "name": "damage_to_third_parties"},
+        {"id": 3, "name": "loss_of_personal_items"}
     ]
 
     assert response.json() == expected_data
@@ -17,7 +20,8 @@ def test_read_category_200():
     response = client.get("/categories/1")
     assert response.status_code == 200
     assert response.json() == {
-        # Enter data of this category
+        "id": 1,
+        "name": "damage_to_third_parties"
     }
 
 def test_read_category_404():
@@ -114,7 +118,22 @@ def test_read_subcategories():
     assert response.status_code == 200
 
     expected_data = [
-        # Fill this in with the expected results in the database
+        {"id": 1, "category_id": 1, "name": "minrisk"},
+        {"id": 2, "category_id": 1, "name": "risk_in_euros"},
+        {"id": 3, "category_id": 1, "name": "deviate_from_identification"},
+        {"id": 4, "category_id": 1, "name": "identify_by_risk"},
+        {"id": 5, "category_id": 2, "name": "minrisk"},
+        {"id": 6, "category_id": 2, "name": "risk_in_euros"},
+        {"id": 7, "category_id": 2, "name": "deviate_from_identification"},
+        {"id": 8, "category_id": 2, "name": "identify_by_risk"},
+        {"id": 9, "category_id": 3, "name": "minrisk"},
+        {"id": 10, "category_id": 3, "name": "risk_in_euros"},
+        {"id": 11, "category_id": 3, "name": "deviate_from_identification"},
+        {"id": 12, "category_id": 3, "name": "identify_by_risk"},
+        {"id": 13, "category_id": 4, "name": "minrisk"},
+        {"id": 14, "category_id": 4, "name": "risk_in_euros"},
+        {"id": 15, "category_id": 4, "name": "deviate_from_identification"},
+        {"id": 16, "category_id": 4, "name": "identify_by_risk"}
     ]
 
     assert response.json() == expected_data
@@ -124,7 +143,9 @@ def test_read_subcategory_200():
     response = client.get("/subcategories/1")
     assert response.status_code == 200
     assert response.json() == {
-        # Enter data of this subcategory
+        "id": 1,
+        "category_id": 1,
+        "name": "minrisk"
     }
 
 def test_read_subcategory_404():
@@ -231,14 +252,14 @@ def test_read_advisory_texts():
 
 # Gets the advice text with the given composite ID's
 def test_read_advisory_text_200():
-    response = client.get("/advisorytexts/catid=1&subid=1")
+    response = client.get("/advisorytexts/id=1")
     assert response.status_code == 200
     assert response.json() == {
         # Enter data of this advisory text
     }
 
 def test_read_advisory_text_404():
-    response = client.get("/advisorytexts/catid=999&subid=999")
+    response = client.get("/advisorytexts/id=999")
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Advice text not found."
@@ -281,7 +302,7 @@ def test_update_advisory_text_200():
         # Enter updated data for an advisory text
     }
 
-    response = client.put("/advisorytexts/catid=1&subid=1", json=updated_data)
+    response = client.put("/advisorytexts/id=1", json=updated_data)
     assert response.status_code == 200
 
 def test_update_advisory_text_404():
@@ -289,7 +310,7 @@ def test_update_advisory_text_404():
         # Enter updated data for an advisory text
     }
 
-    response = client.put("/advisorytexts/catid=999&subid=999", json=updated_data)
+    response = client.put("/advisorytexts/id=999", json=updated_data)
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Advice text not found."
@@ -300,7 +321,7 @@ def test_update_advisory_text_403():
         # Enter updated data for an advisory text
     }
 
-    response = client.put("/advisorytexts/catid=3&subid=3", json=updated_data)
+    response = client.put("/advisorytexts/id=3", json=updated_data)
     assert response.status_code == 403
     assert response.json() == {
         "detail": "You are not allowed to update an advisory text."
@@ -308,18 +329,18 @@ def test_update_advisory_text_403():
 
 # Deletes the advice text with the given ID
 def test_delete_advisory_text_204():
-    response = client.delete("/advisorytexts/catid=1&subid=1")
+    response = client.delete("/advisorytexts/id=1")
     assert response.status_code == 204
 
 def test_delete_advisory_text_404():
-    response = client.delete("/advisorytexts/catid=999&subid=999")
+    response = client.delete("/advisorytexts/id=999")
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Advice text not found."
     }
 
 def test_delete_advisory_text_403():
-    response = client.delete("/advisorytexts/catid=3&subid=3")
+    response = client.delete("/advisorytexts/id=3")
     assert response.status_code == 403
     assert response.json() == {
         "detail": "You are not allowed to delete an advisory text."
