@@ -125,27 +125,27 @@ def read_subcategory(
         return HTTPException(status_code=404, detail="Subcategory not found.")
     return subcategory
 
-# Create a new subcategory
-@app.post("/subcategories/", tags=["Advisory Texts"])
-def create_subcategory(
-        subcategory_create: SubCategoryModel,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-):
-    """
-    Creates a new subcategory of risk willingness.
-    """
-    if current_user.role == "admin":
-        subcategory = db.get(SubCategory, subcategory_create.name)
-        if subcategory:
-            raise HTTPException(status_code=400, detail="This subcategory already exists.")
-        new_subcategory = SubCategory(name=subcategory_create.name)
-        db.add(new_subcategory)
-        db.commit()
-        db.refresh(new_subcategory)
-        return Response(status_code=201, content=f"Subcategory {new_subcategory.name} successfully created.")
-    else:
-        raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
+# Create a new subcategory (Currently disabled, as it isn't supposed to be used)
+# @app.post("/subcategories/", tags=["Advisory Texts"])
+# def create_subcategory(
+#         subcategory_create: SubCategoryModel,
+#         db: Session = Depends(get_db),
+#         current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     Creates a new subcategory of risk willingness.
+#     """
+#     if current_user.role == "admin":
+#         subcategory = db.get(SubCategory, subcategory_create.name)
+#         if subcategory:
+#             raise HTTPException(status_code=400, detail="This subcategory already exists.")
+#         new_subcategory = SubCategory(name=subcategory_create.name)
+#         db.add(new_subcategory)
+#         db.commit()
+#         db.refresh(new_subcategory)
+#         return Response(status_code=201, content=f"Subcategory {new_subcategory.name} successfully created.")
+#     else:
+#         raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
 
 # Update the subcategory with the given ID
 @app.put("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
@@ -229,12 +229,16 @@ def create_text(
     """
     if current_user.role == "admin":
         advice = db.query(AdvisoryText).filter(AdvisoryText.text == advisory_text_create.text).first()
+        category = db.query(Category).filter(Category.id == advisory_text_create.category_id).first()
         if advice:
             raise HTTPException(status_code=400, detail="This text already exists.")
-        new_advice = AdvisoryText(text=advisory_text_create.text, category=advisory_text_create.category, sub_category=advisory_text_create.sub_category)
+        new_advice = AdvisoryText(text=advisory_text_create.text, category=category.name, sub_category=advisory_text_create.sub_category)
+        new_subcategory = SubCategory(name=advisory_text_create.sub_category, category_id=category.id)
         db.add(new_advice)
+        db.add(new_subcategory)
         db.commit()
         db.refresh(new_advice)
+        db.refresh(new_subcategory)
         return Response(status_code=201, content=f"AdvisoryText {new_advice.text} successfully created.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to create an advisory text.")
