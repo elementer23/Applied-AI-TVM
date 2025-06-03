@@ -1,12 +1,9 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from typing import List, Dict, Any
-import os
-import json
-
-from dotenv import load_dotenv
+from typing import List
 from tools.db_tool import advisory_db_tool
+from tools.category_tool import category_tool
 
 
 @CrewBase
@@ -21,6 +18,7 @@ class Tvm():
         return Agent(
             config=self.agents_config['reader'],
             verbose=True,
+            tools=[category_tool]
         )
 
     @agent
@@ -62,36 +60,42 @@ class Tvm():
         )
 
     @task
+    def get_available_categories(self) -> Task:
+        """Simple task to get all available categories and subcategories"""
+        return Task(
+            description="""
+                Use the Category Tool to get all available categories and subcategories from the database.
+
+                This will provide you with the current list of all available categories and their 
+                associated subcategories that exist in the system.
+                """,
+            expected_output="A JSON structure containing all categories and their subcategories from the database.",
+            agent=self.reader()
+        )
+
+    @task
     def decide_template_category(self) -> Task:
         return Task(
             description="""
-                Analyze the research context to determine which advisory text best fits the client's needs.
+                Analyze the research context and available categories to determine which advisory 
+                text best fits the client's needs.
 
-                Based on the advisory_texts table structure, choose the appropriate:
+                Steps:
+                1. Review the available categories and subcategories from the previous task
+                2. Analyze the research context to understand the client's situation
+                3. Choose the most appropriate category and subcategory combination
 
-                CATEGORY options:
-                - damage_to_third_parties
-                - damage_by_standstill  
-                - loss_of_personal_items
-                - damage_to_passengers
-
-                SUB_CATEGORY options:
-                - minrisk
-                - risk_in_euros
-                - deviate_from_identification
-                - identify_by_risk
-
-                Output EXACTLY this JSON format with exact field names:
+                Output EXACTLY this JSON format:
                 {
-                    "category": "exact_category_name",
-                    "sub_category": "exact_sub_category_name"
+                    "category": "exact_category_name_from_database",
+                    "sub_category": "exact_sub_category_name_from_database"
                 }
 
-                Make sure the values match exactly what exists in the database.
+                Make sure the values match exactly what was retrieved from the database.
                 """,
             expected_output="A JSON object with 'category' and 'sub_category' fields containing exact database values.",
             agent=self.reader(),
-            context=[self.research()]
+            context=[self.research(), self.get_available_categories()]
         )
 
     @task
@@ -110,11 +114,8 @@ class Tvm():
                 - You MUST return the actual text content, not SQL statements
                 - If no exact match found, the tool will show available alternatives
                 - Handle any partial matches appropriately
-
-                Example tool call:
-                Advisory Database Tool(category="damage_to_third_parties", sub_category="minrisk")
                 """,
-            expected_output="The complete Dutch advisory text template from the advisory_texts.text column. This must be actual text content that can be used as a template.",
+            expected_output="The complete Dutch advisory text template from the advisory_texts.text column.",
             agent=self.db_specialist(),
             context=[self.decide_template_category()]
         )
@@ -134,7 +135,7 @@ class Tvm():
                 6. Maintain the original template format and structure
 
                 If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
-                
+
                 CRITICAL:
                 - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
                 - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
