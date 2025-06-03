@@ -111,6 +111,27 @@ def read_subcategories(
         return HTTPException(status_code=404, detail="No subcategories found.")
     return subcategories
 
+
+# Get all subcategories by category ID
+@app.get("/categories/{category_id}/subcategories", response_model=List[SubCategoryResponse], tags=["Advisory Texts"])
+def read_subcategories_by_category(
+        category_id: int,
+        db: Session = Depends(get_db)
+):
+    """
+    Gets all subcategories for a specific category ID.
+    """
+    category = db.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found.")
+
+    subcategories = db.query(SubCategory).filter(SubCategory.category_id == category_id).all()
+    if not subcategories:
+        raise HTTPException(status_code=404, detail="No subcategories found for this category.")
+
+    return subcategories
+
+
 # Get the subcategory with the given ID
 @app.get("/subcategories/{subcategory_id}", response_model=SubCategoryResponse, tags=["Advisory Texts"])
 def read_subcategory(
@@ -148,47 +169,47 @@ def read_subcategory(
 #         raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
 
 # Update the subcategory with the given ID
-@app.put("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
-def update_subcategory(
-        subcategory_id: int,
-        subcategory_update: SubCategoryModel,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-):
-    """
-    Update a specific subcategory of risk willingness for the given ID.
-    """
-    if current_user.role == "admin":
-        subcategory = db.get(SubCategory, subcategory_id)
-        if not subcategory:
-            return HTTPException(status_code=404, detail="Subcategory not found.")
-        subcategory.name = subcategory_update.name
-        db.commit()
-        db.refresh(subcategory)
-        return Response(status_code=200, content=f"Subcategory {subcategory.name} successfully updated.")
-    else:
-        raise HTTPException(status_code=403, detail="You are not allowed to update a subcategory.")
+# @app.put("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
+# def update_subcategory(
+#         subcategory_id: int,
+#         subcategory_update: SubCategoryModel,
+#         db: Session = Depends(get_db),
+#         current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     Update a specific subcategory of risk willingness for the given ID.
+#     """
+#     if current_user.role == "admin":
+#         subcategory = db.get(SubCategory, subcategory_id)
+#         if not subcategory:
+#             return HTTPException(status_code=404, detail="Subcategory not found.")
+#         subcategory.name = subcategory_update.name
+#         db.commit()
+#         db.refresh(subcategory)
+#         return Response(status_code=200, content=f"Subcategory {subcategory.name} successfully updated.")
+#     else:
+#         raise HTTPException(status_code=403, detail="You are not allowed to update a subcategory.")
 
 # Delete the subcategory with the given ID
-@app.delete("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
-def delete_category(
-        subcategory_id: int,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-):
-    """
-    Delete the subcategory of risk willingness corresponding to the given ID.
-    """
-    if current_user.role == "admin":
-        subcategory = db.get(SubCategory, subcategory_id)
-        if not subcategory:
-            return HTTPException(status_code=404, detail="Subcategory not found.")
-        db.delete(subcategory)
-        db.commit()
-        db.refresh(subcategory)
-        return Response(status_code=204, content=f"Subcategory {subcategory} successfully deleted.")
-    else:
-        raise HTTPException(status_code=403, detail="You are not allowed to delete a subcategory.")
+# @app.delete("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
+# def delete_category(
+#         subcategory_id: int,
+#         db: Session = Depends(get_db),
+#         current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     Delete the subcategory of risk willingness corresponding to the given ID.
+#     """
+#     if current_user.role == "admin":
+#         subcategory = db.get(SubCategory, subcategory_id)
+#         if not subcategory:
+#             return HTTPException(status_code=404, detail="Subcategory not found.")
+#         db.delete(subcategory)
+#         db.commit()
+#         db.refresh(subcategory)
+#         return Response(status_code=204, content=f"Subcategory {subcategory} successfully deleted.")
+#     else:
+#         raise HTTPException(status_code=403, detail="You are not allowed to delete a subcategory.")
 
 # Gets all advice texts
 @app.get("/advisorytexts/", response_model=List[AdvisoryTextResponse], tags=["Advisory Texts"])
@@ -278,10 +299,47 @@ def delete_text(
     if current_user.role == "admin":
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
-            return HTTPException(status_code=404, detail="Advice text not found.")
+            raise HTTPException(status_code=404, detail="Advice text not found.")
+
+        category = db.query(Category).filter(Category.name == advisorytext.category).first()
+        if category:
+            subcategory = db.query(SubCategory).filter(
+                SubCategory.name == advisorytext.sub_category,
+                SubCategory.category_id == category.id
+            ).first()
+            if subcategory:
+                db.delete(subcategory)
+
         db.delete(advisorytext)
         db.commit()
-        db.refresh(advisorytext)
-        return Response(status_code=204, content=f"Subcategory {advisorytext} successfully deleted.")
+
+        return Response(status_code=200, content=f"Advisory text and corresponding subcategory successfully deleted.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete an advisory text.")
+
+
+@app.get("/advisorytexts/subcategory/{subcategory_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
+def read_text_by_subcategory(
+        subcategory_id: int,
+        db: Session = Depends(get_db)
+):
+    """
+    Gets the advisory text for a specific subcategory ID.
+    """
+    subcategory = db.query(SubCategory).filter(SubCategory.id == subcategory_id).first()
+    if not subcategory:
+        raise HTTPException(status_code=404, detail="Subcategory not found.")
+
+    category = db.get(Category, subcategory.category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found.")
+
+    advisorytext = db.query(AdvisoryText).filter(
+        AdvisoryText.category == category.name,
+        AdvisoryText.sub_category == subcategory.name
+    ).first()
+
+    if not advisorytext:
+        raise HTTPException(status_code=404, detail="No advisory text found for this subcategory.")
+
+    return advisorytext
