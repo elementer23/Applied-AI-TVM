@@ -35,6 +35,23 @@ class AdvisoryText(Base):
     text = Column(Text)
 
 
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(255), unique=True, index=True, nullable=False)
+
+    subcategories = relationship("SubCategory", back_populates="category")
+
+
+class SubCategory(Base):
+    __tablename__ = "sub_categories"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), index=True, nullable=False)
+    name = Column(String(255), nullable=False)
+
+    category = relationship("Category", back_populates="subcategories")
+
+
 class Conversation(Base):
     __tablename__ = "conversations"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -90,3 +107,18 @@ class AdvisoryTextResponse(BaseModel):
     category: str
     sub_category: str
     text: str
+
+
+class UserUpdateRequest(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+    role: Optional[str] = None
+
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    role: str
+
+    class Config:
+        from_attributes = True
