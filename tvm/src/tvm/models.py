@@ -109,6 +109,31 @@ class AdvisoryTextResponse(BaseModel):
     text: str
 
 
+class AdvisoryTextModel(BaseModel):
+    category_id: int
+    sub_category: str
+    text: str
+
+
+class CategoryResponse(BaseModel):
+    id: int
+    name: str
+
+
+class CategoryModel(BaseModel):
+    name: str
+
+
+class SubCategoryResponse(BaseModel):
+    id: int
+    category_id: int
+    name: str
+
+
+class SubCategoryModel(BaseModel):
+    name: str
+
+      
 class UserUpdateRequest(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
@@ -122,3 +147,4 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
