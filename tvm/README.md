@@ -1,52 +1,80 @@
-# Tvm Crew
 
-Welcome to the Tvm Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+# TVM AI
+This project contains a multi-agent AI system powered by [CrewAI](https://docs.crewai.com/introduction) and [FastAPI](https://fastapi.tiangolo.com/). The goal of this project is to rewrite texts using AI with the help of templates and make this accessible using an API.
 
 ## Installation
+Ensure you have Python >=3.10 <3.13 installed on your system, any other version will result in unexpected errors. This project uses UV for dependency management and package handling, offering a seamless setup and execution experience.
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
-
+### Installing UV
 First, if you haven't already, install uv:
 
+**On windows:**
 ```bash
-pip install uv
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex
 ```
 
-Next, navigate to your project directory and install the dependencies:
+**On MacOS/Linux:**
 
-(Optional) Lock the dependencies and install them by using the CLI command:
+Using curl
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+Alternatively using wget
+```bash
+wget -qO- https://astral.sh/uv/install.sh | sh
+```
+
+If you run into any issues, refer to [UV's installation guide](https://docs.astral.sh/uv/getting-started/installation/) for more information.
+
+### Installing CrewAI
+Run the following command to install CrewAI
+```bash
+uv tool install crewai
+```
+
+If you encounter a PATH warning, run this command to update your shell:
+```bash
+uv tool update-shell
+```
+
+If you encounter the chroma-hnswlib==0.7.6 build error (fatal error C1083: Cannot open include file: 'float.h') on Windows, install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/) with Desktop development with C++.
+
+To verify that crewai is installed, run:
+```bash
+uv tool list
+```
+
+You should see something like:
+```
+crewai v0.102.0
+- crewai
+```
+
+#### Updating
+If you need to update crewai, run:
+```bash
+uv tool install crewai --upgrade
+```
+
+### Installing dependencies
+This project uses UV for dependency management. To setup a venc and install all dependencies run:
 ```bash
 crewai install
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+## Setup environment variables
+This projects includes a .env.dist, this documents includes examples of possible entries. At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
 
-- Modify `src/tvm/config/agents.yaml` to define your agents
-- Modify `src/tvm/config/tasks.yaml` to define your tasks
-- Modify `src/tvm/crew.py` to add your own logic, tools and specific args
-- Modify `src/tvm/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project with FastAPI
-
-To kickstart your crew of AI agents and begin task execution, run this from the src/tvm folder of your project:
-
+## Run the application
+First activate the venv by runnning:
 ```bash
-$ uvicorn main:app
+.venv\Scripts\activate
 ```
 
-This command will start the FastAPI instance and will run the agent when the endpoint is used.
-
-## Understanding Your Crew
-
-The TVM Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
-
-## Support
-
-For support, questions, or feedback regarding the Tvm Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.
+To start the application run:
+```bash
+cd src/tvm
+```
+```bash
+uvicorn main:app
+```
