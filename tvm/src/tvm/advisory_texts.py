@@ -251,8 +251,14 @@ def create_text(
     if current_user.role == "admin":
         advice = db.query(AdvisoryText).filter(AdvisoryText.text == advisory_text_create.text).first()
         category = db.query(Category).filter(Category.id == advisory_text_create.category_id).first()
+        sub_category = db.query(SubCategory).filter(
+            SubCategory.name == advisory_text_create.sub_category,
+            SubCategory.category_id == advisory_text_create.category_id
+        ).first()
         if advice:
             raise HTTPException(status_code=400, detail="This text already exists.")
+        if sub_category:
+            raise HTTPException(status_code=400, detail="this subcategory already exists")
         new_advice = AdvisoryText(text=advisory_text_create.text, category=category.name, sub_category=advisory_text_create.sub_category)
         new_subcategory = SubCategory(name=advisory_text_create.sub_category, category_id=category.id)
         db.add(new_advice)
