@@ -6,13 +6,14 @@ from models import Base, InputData
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
+from dotenv import load_dotenv
 
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
 
 _original_init = mysql_loader_module.MySQLLoader.__init__
-
+load_dotenv()
 
 def patched_init(self, config):
     url = config.get("url")
@@ -30,7 +31,7 @@ def patched_init(self, config):
 
 
 mysql_loader_module.MySQLLoader.__init__ = patched_init
-from crew import Tvm
+from tvm.crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 

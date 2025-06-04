@@ -1,4 +1,4 @@
-from test_main import client
+from .test_main import client
 
 
 # Get all categories
