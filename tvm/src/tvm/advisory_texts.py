@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
-from main import app, get_db
+from main import app
+from db import get_db
 from models import *
 from authentication import get_current_user
 from typing import List
