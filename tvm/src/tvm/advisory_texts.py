@@ -274,7 +274,7 @@ def create_text(
 @app.put("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
 def update_text(
         text_id: int,
-        advisory_text_update: AdvisoryTextModel,
+        advisory_text_update: AdvisoryTextUpdateModel,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
