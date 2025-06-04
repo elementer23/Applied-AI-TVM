@@ -66,7 +66,7 @@ crewai install
 This application requires a MySQL database to function. Furthermore, it is required to use InnoDB as the engine. The connection string of the database needs to be specified in the .env file. The tables will be automatically created when the application is started.
 
 ## Setup environment variables
-This projects includes a .env.dist, this documents includes examples of possible entries. Create a file called '.env' At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
+This projects includes a .env.dist, this document includes examples of possible entries. Create a file called '.env' At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
 
 ## Run the application
 First activate the venv by runnning:
