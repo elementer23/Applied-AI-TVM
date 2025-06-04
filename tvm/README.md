@@ -57,13 +57,16 @@ uv tool install crewai --upgrade
 ```
 
 ### Installing dependencies
-This project uses UV for dependency management. To setup a venc and install all dependencies run:
+This project uses UV for dependency management. To set up a venv and install all dependencies run:
 ```bash
 crewai install
 ```
 
+## MySQL Database
+This application requires a MySQL database to function. Furthermore, it is required to use InnoDB as the engine. The connection string of the database needs to be specified in the .env file. The tables will be automatically created when the application is started.
+
 ## Setup environment variables
-This projects includes a .env.dist, this documents includes examples of possible entries. At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
+This projects includes a .env.dist, this documents includes examples of possible entries. Create a file called '.env' At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
 
 ## Run the application
 First activate the venv by runnning:
@@ -77,4 +80,16 @@ cd src/tvm
 ```
 ```bash
 uvicorn main:app
+```
+
+## Create admin account
+Before you can make an admin account, make sure the application has been started at least once and the tables in the database are created. To then create an account run the following command from the src/tvm folder:
+```bash
+python init_admin.py
+```
+
+## Initialize database categories and texts
+When the database is first created it is completely empty. To quickly import the predefined categories and texts run the following command from the src/tvm folder:
+```bash
+python init_db.py
 ```
