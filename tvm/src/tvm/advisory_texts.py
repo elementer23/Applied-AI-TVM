@@ -17,7 +17,7 @@ def read_categories(
     """
     categories = db.query(Category).all()
     if not categories:
-        return HTTPException(status_code=404, detail="No categories found.")
+        raise HTTPException(status_code=404, detail="No categories found.")
     return categories
 
 # Get the category with the given ID
@@ -31,7 +31,7 @@ def read_category(
     """
     category = db.get(Category, category_id)
     if not category:
-        return HTTPException(status_code=404, detail="Category not found.")
+        raise HTTPException(status_code=404, detail="Category not found.")
     return category
 
 # Create a new category
@@ -70,7 +70,7 @@ def update_category(
     if current_user.role == "admin":
         category = db.get(Category, category_id)
         if not category:
-            return HTTPException(status_code=404, detail="Category not found.")
+            raise HTTPException(status_code=404, detail="Category not found.")
         category.name = category_update.name
         db.commit()
         db.refresh(category)
@@ -91,7 +91,7 @@ def delete_category(
     if current_user.role == "admin":
         category = db.get(Category, category_id)
         if not category:
-            return HTTPException(status_code=404, detail="Category not found.")
+            raise HTTPException(status_code=404, detail="Category not found.")
         db.delete(category)
         db.commit()
         db.refresh(category)
@@ -109,7 +109,7 @@ def read_subcategories(
     """
     subcategories = db.query(SubCategory).all()
     if not subcategories:
-        return HTTPException(status_code=404, detail="No subcategories found.")
+        raise HTTPException(status_code=404, detail="No subcategories found.")
     return subcategories
 
 # Get the subcategory with the given ID
@@ -123,7 +123,7 @@ def read_subcategory(
     """
     subcategory = db.query(SubCategory).filter(SubCategory.id == subcategory_id).first()
     if not subcategory:
-        return HTTPException(status_code=404, detail="Subcategory not found.")
+        raise HTTPException(status_code=404, detail="Subcategory not found.")
     return subcategory
 
 # Create a new subcategory (Currently disabled, as it isn't supposed to be used)
@@ -162,7 +162,7 @@ def update_subcategory(
     if current_user.role == "admin":
         subcategory = db.get(SubCategory, subcategory_id)
         if not subcategory:
-            return HTTPException(status_code=404, detail="Subcategory not found.")
+            raise HTTPException(status_code=404, detail="Subcategory not found.")
         subcategory.name = subcategory_update.name
         db.commit()
         db.refresh(subcategory)
@@ -183,7 +183,7 @@ def delete_category(
     if current_user.role == "admin":
         subcategory = db.get(SubCategory, subcategory_id)
         if not subcategory:
-            return HTTPException(status_code=404, detail="Subcategory not found.")
+            raise HTTPException(status_code=404, detail="Subcategory not found.")
         db.delete(subcategory)
         db.commit()
         db.refresh(subcategory)
@@ -201,7 +201,7 @@ def read_texts(
     """
     advisorytexts = db.query(AdvisoryText).all()
     if not advisorytexts:
-        return HTTPException(status_code=404, detail="No advice texts found.")
+        raise HTTPException(status_code=404, detail="No advice texts found.")
     return advisorytexts
 
 # Gets the advice text with the given composite ID's
@@ -215,7 +215,7 @@ def read_text(
     """
     advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
     if not advisorytext:
-        return HTTPException(status_code=404, detail="Advice text not found.")
+        raise HTTPException(status_code=404, detail="Advice text not found.")
     return advisorytext
 
 # Create new advice text
@@ -258,7 +258,7 @@ def update_text(
     if current_user.role == "admin":
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
-            return HTTPException(status_code=404, detail="Advice text not found.")
+            raise HTTPException(status_code=404, detail="Advice text not found.")
         advisorytext.text = advisory_text_update.text
         db.commit()
         db.refresh(advisorytext)
@@ -279,7 +279,7 @@ def delete_text(
     if current_user.role == "admin":
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
-            return HTTPException(status_code=404, detail="Advice text not found.")
+            raise HTTPException(status_code=404, detail="Advice text not found.")
         db.delete(advisorytext)
         db.commit()
         db.refresh(advisorytext)
