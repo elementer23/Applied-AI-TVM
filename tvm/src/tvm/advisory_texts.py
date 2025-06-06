@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, Response
 from sqlalchemy.orm import Session
-from main import app, get_db
+from main import app
+from db import get_db
 from models import *
 from authentication import get_current_user
 from typing import List
@@ -44,7 +45,7 @@ def create_category(
     Create a new category of risk.
     """
     if current_user.role == "admin":
-        category = db.get(Category, category_create.name)
+        category = db.query(Category).filter_by(name=category_create.name).first()
         if category:
             raise HTTPException(status_code=400, detail="This category already exists.")
         new_category = Category(name=category_create.name)
@@ -70,14 +71,10 @@ def update_category(
         category = db.get(Category, category_id)
         if not category:
             raise HTTPException(status_code=404, detail="Category not found.")
-
         old_category_name = category.name
-        new_category_name = category_update.name
+        category.name  = category_update.name
 
-        category.name = new_category_name
-
-        db.query(AdvisoryText).filter(AdvisoryText.category == old_category_name).update({"category": new_category_name})
-
+        db.query(AdvisoryText).filter(AdvisoryText.category == old_category_name).update({"category": category.name})
         db.commit()
         db.refresh(category)
         return Response(status_code=200, content=f"Category {category.name} successfully updated.")
@@ -219,6 +216,7 @@ def read_subcategory(
 #     else:
 #         raise HTTPException(status_code=403, detail="You are not allowed to delete a subcategory.")
 
+
 # Gets all advice texts
 @app.get("/advisorytexts/", response_model=List[AdvisoryTextResponse], tags=["Advisory Texts"])
 def read_texts(
@@ -314,7 +312,6 @@ def delete_text(
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
             raise HTTPException(status_code=404, detail="Advice text not found.")
-
         category = db.query(Category).filter(Category.name == advisorytext.category).first()
         if category:
             subcategory = db.query(SubCategory).filter(

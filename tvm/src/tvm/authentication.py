@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import os
 import secrets
 from models import User, RefreshToken, RefreshTokenRequest, UserResponse, UserUpdateRequest
-from main import get_db
+from db import get_db
 
 SECRET_KEY = os.environ.get("SECRET")
 ALGORITHM = "HS256"
