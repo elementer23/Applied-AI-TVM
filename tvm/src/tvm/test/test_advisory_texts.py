@@ -101,7 +101,7 @@ def test_update_category_403():
 # Delete the category with the given ID
 def test_delete_category_204():
     token = get_token_admin()
-    response = client.delete("/categories/1", headers={"Authorization": f"Bearer {token}"})
+    response = client.delete("/categories/2", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 204
 
 def test_delete_category_404():
@@ -307,7 +307,7 @@ def test_read_advisory_text_404():
 # Create new advice text
 def test_create_advisory_text_201():
     advisory_text_data = {
-        "category": "damage_to_passengers",
+        "category_id": 4,
         "sub_category": "risk_in_euros",
         "text": "New Advisory Text"
     }
@@ -318,21 +318,21 @@ def test_create_advisory_text_201():
 
 def test_create_advisory_text_400():
     advisory_text_data = {
-        "category": "damage_to_passengers",
+        "category_id": 4,
         "sub_category": "risk_in_euros",
         "text": "Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van 10.000 wilt en kunt dragen. Mijn advies is om (SVI dekking af te sluiten./ een SVI dekking af te sluiten. Voor het verzekerde bedrag en het eigen risico verwijs ik u naar de polis.) U geeft aan dat u [volg_advies_op]"
     }
     token = get_token_admin()
 
     response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 404
+    assert response.status_code == 400
     assert response.json() == {
         "detail": "This text already exists."
     }
 
 def test_create_advisory_text_403():
     advisory_text_data = {
-        "category": "damage_to_passengers",
+        "category_id": 4,
         "sub_category": "risk_in_euros",
         "text": "New Advisory Text"
     }
@@ -347,7 +347,7 @@ def test_create_advisory_text_403():
 # Edits the advice text with the given ID
 def test_update_advisory_text_200():
     updated_data = {
-        "category": "loss_of_personal_items",
+        "category_id": 3,
         "sub_category": "minrisk",
         "text": "Tijdens de inventarisatie maken we een andere tekst"
     }
@@ -358,7 +358,7 @@ def test_update_advisory_text_200():
 
 def test_update_advisory_text_404():
     updated_data = {
-        "category": "loss_of_personal_items",
+        "category_id": 3,
         "sub_category": "minrisk",
         "text": "Tijdens de inventarisatie maken we een andere tekst"
     }
@@ -372,7 +372,7 @@ def test_update_advisory_text_404():
 
 def test_update_advisory_text_403():
     updated_data = {
-        "category": "loss_of_personal_items",
+        "category_id": 3,
         "sub_category": "minrisk",
         "text": "Tijdens de inventarisatie maken we een andere tekst"
     }

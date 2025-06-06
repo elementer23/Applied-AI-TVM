@@ -45,7 +45,7 @@ def create_category(
     Create a new category of risk.
     """
     if current_user.role == "admin":
-        category = db.get(Category, category_create.name)
+        category = db.query(Category).filter_by(name=category_create.name).first()
         if category:
             raise HTTPException(status_code=400, detail="This category already exists.")
         new_category = Category(name=category_create.name)
@@ -94,7 +94,7 @@ def delete_category(
             raise HTTPException(status_code=404, detail="Category not found.")
         db.delete(category)
         db.commit()
-        db.refresh(category)
+        # db.refresh(category)
         return Response(status_code=204, content=f"Category {category} successfully deleted.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete a category.")
@@ -186,7 +186,7 @@ def delete_category(
             raise HTTPException(status_code=404, detail="Subcategory not found.")
         db.delete(subcategory)
         db.commit()
-        db.refresh(subcategory)
+        # db.refresh(subcategory)
         return Response(status_code=204, content=f"Subcategory {subcategory} successfully deleted.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete a subcategory.")
@@ -282,7 +282,7 @@ def delete_text(
             raise HTTPException(status_code=404, detail="Advice text not found.")
         db.delete(advisorytext)
         db.commit()
-        db.refresh(advisorytext)
+        # db.refresh(advisorytext)
         return Response(status_code=204, content=f"Subcategory {advisorytext} successfully deleted.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete an advisory text.")

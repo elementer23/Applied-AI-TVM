@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-
+from tvm.db import reset_database, run_init_db
+import pytest
 from tvm.main import app
 
 client = TestClient(app)
@@ -22,3 +23,9 @@ def get_token_not_admin() -> str:
     response = client.post("/token", data=login, headers={"Content-Type": "application/x-www-form-urlencoded"})
     assert response.status_code == 200
     return response.json()["access_token"]
+
+
+@pytest.fixture(scope="function", autouse=True)
+def prepare_database():
+    reset_database()
+    run_init_db()

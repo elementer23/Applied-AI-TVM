@@ -40,7 +40,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(255), unique=True, index=True, nullable=False)
 
-    subcategories = relationship("SubCategory", back_populates="category")
+    subcategories = relationship("SubCategory", back_populates="category", cascade="all, delete-orphan")
 
 
 class SubCategory(Base):

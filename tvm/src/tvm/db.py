@@ -1,8 +1,9 @@
 from models import Base
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
+import subprocess
 
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
@@ -39,3 +40,32 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def reset_database():
+    """
+    Truncate selected tables and reset auto-increment counters.
+    """
+    tables_to_truncate = [
+        "advisory_texts",
+        "categories",
+        "sub_categories"
+    ]
+
+    with engine.connect() as conn:
+        trans = conn.begin()
+        try:
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
+
+            for table in tables_to_truncate:
+                conn.execute(text(f"TRUNCATE TABLE {table};"))
+
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
+            trans.commit()
+        except Exception as e:
+            trans.rollback()
+            print("Failed to reset database:", e)
+            raise
+
+
+def run_init_db():
+    subprocess.run(["python", "init_db.py"], check=True)
