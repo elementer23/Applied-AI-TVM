@@ -1,24 +1,4 @@
-from .test_main import client
-
-def get_token_admin() -> str:
-    login = {
-        "username": "test_user",
-        "password": "test_pass"
-    }
-    response = client.post("/token", data=login, headers={"Content-Type": "application/x-www-form-urlencoded"})
-    assert response.status_code == 200
-    return response.json()["access_token"]
-
-
-def get_token_not_admin() -> str:
-    login = {
-        "username": "test_not_admin",
-        "password": "notadminpass"
-    }
-    response = client.post("/token", data=login, headers={"Content-Type": "application/x-www-form-urlencoded"})
-    assert response.status_code == 200
-    return response.json()["access_token"]
-
+from .test_main import *
 
 # Get all categories
 def test_read_categories():
