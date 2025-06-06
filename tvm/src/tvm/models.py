@@ -115,6 +115,10 @@ class AdvisoryTextModel(BaseModel):
     text: str
 
 
+class AdvisoryTextUpdateModel(BaseModel):
+    text: str
+
+
 class CategoryResponse(BaseModel):
     id: int
     name: str
