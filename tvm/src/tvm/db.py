@@ -1,9 +1,10 @@
-from models import Base
+from models import Base, User
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
 import subprocess
+from passlib.context import CryptContext
 
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
@@ -34,12 +35,37 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+def initial_test_database():
+    db = SessionLocal()
+
+    admin_username = "test_user"
+    if db.query(User).filter(User.username == admin_username).first():
+        db.close()
+        return
+    hashed_admin_password = get_password_hash("test_pass")
+    admin_user = User(username=admin_username, hashed_password=hashed_admin_password, role="admin")
+
+    not_admin_username = "test_not_admin"
+    if db.query(User).filter(User.username == not_admin_username).first():
+        db.close()
+        return
+    hashed_user_password = get_password_hash("notadminpass")
+    not_admin_user = User(username=not_admin_username, hashed_password=hashed_user_password, role="user")
+
+    db.add(admin_user)
+    db.add(not_admin_user)
+    db.commit()
+    db.close()
 
 # Resets the database, used for unit testing
 def reset_database():
@@ -68,3 +94,7 @@ def reset_database():
 # Method that runs init_db.py automatically
 def run_init_db():
     subprocess.run(["python", "init_db.py"], check=True)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
