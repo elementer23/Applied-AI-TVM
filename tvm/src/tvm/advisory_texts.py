@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status, Response
+from fastapi import Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from main import app, get_db
 from models import *
@@ -70,7 +70,14 @@ def update_category(
         category = db.get(Category, category_id)
         if not category:
             raise HTTPException(status_code=404, detail="Category not found.")
-        category.name = category_update.name
+
+        old_category_name = category.name
+        new_category_name = category_update.name
+
+        category.name = new_category_name
+
+        db.query(AdvisoryText).filter(AdvisoryText.category == old_category_name).update({"category": new_category_name})
+
         db.commit()
         db.refresh(category)
         return Response(status_code=200, content=f"Category {category.name} successfully updated.")
@@ -91,10 +98,11 @@ def delete_category(
         category = db.get(Category, category_id)
         if not category:
             raise HTTPException(status_code=404, detail="Category not found.")
+        db.query(SubCategory).filter(SubCategory.category_id == category_id).delete()
+        db.query(AdvisoryText).filter(AdvisoryText.category == category.name).delete()
         db.delete(category)
         db.commit()
-        db.refresh(category)
-        return Response(status_code=204, content=f"Category {category} successfully deleted.")
+        return Response(status_code=204)
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete a category.")
 
