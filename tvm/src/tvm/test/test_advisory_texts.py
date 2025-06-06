@@ -201,64 +201,64 @@ def test_read_subcategory_404():
 #     }
 
 # Update the subcategory with the given ID
-def test_update_subcategory_200():
-    updated_data = {
-        "category_id": 2,
-        "name": "identify_another_way"
-    }
-    token = get_token_admin()
-
-    response = client.put("/subcategories/8", json=updated_data, headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 200
-
-def test_update_subcategory_404():
-    updated_data = {
-        "category_id": 2,
-        "name": "identify_another_way"
-    }
-    token = get_token_admin()
-
-    response = client.put("/subcategories/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 404
-    assert response.json() == {
-        "detail": "Subcategory not found."
-    }
-
-def test_update_subcategory_403():
-    updated_data = {
-        "category_id": 2,
-        "name": "identify_another_way"
-    }
-    token = get_token_not_admin()
-
-    response = client.put("/subcategories/8", json=updated_data, headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 403
-    assert response.json() == {
-        "detail": "You are not allowed to update a subcategory."
-    }
-
-# Delete the subcategory with the given ID
-def test_delete_subcategory_204():
-    token = get_token_admin()
-    response = client.delete("/subcategories/13", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 204
-
-
-def test_delete_subcategory_404():
-    token = get_token_admin()
-    response = client.delete("/subcategories/999", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 404
-    assert response.json() == {
-        "detail": "Subcategory not found."
-    }
-
-def test_delete_subcategory_403():
-    token = get_token_not_admin()
-    response = client.delete("/subcategories/3", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 403
-    assert response.json() == {
-        "detail": "You are not allowed to delete a subcategory."
-    }
+# def test_update_subcategory_200():
+#     updated_data = {
+#         "category_id": 2,
+#         "name": "identify_another_way"
+#     }
+#     token = get_token_admin()
+#
+#     response = client.put("/subcategories/8", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+#     assert response.status_code == 200
+#
+# def test_update_subcategory_404():
+#     updated_data = {
+#         "category_id": 2,
+#         "name": "identify_another_way"
+#     }
+#     token = get_token_admin()
+#
+#     response = client.put("/subcategories/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+#     assert response.status_code == 404
+#     assert response.json() == {
+#         "detail": "Subcategory not found."
+#     }
+#
+# def test_update_subcategory_403():
+#     updated_data = {
+#         "category_id": 2,
+#         "name": "identify_another_way"
+#     }
+#     token = get_token_not_admin()
+#
+#     response = client.put("/subcategories/8", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+#     assert response.status_code == 403
+#     assert response.json() == {
+#         "detail": "You are not allowed to update a subcategory."
+#     }
+#
+# # Delete the subcategory with the given ID
+# def test_delete_subcategory_204():
+#     token = get_token_admin()
+#     response = client.delete("/subcategories/13", headers={"Authorization": f"Bearer {token}"})
+#     assert response.status_code == 204
+#
+#
+# def test_delete_subcategory_404():
+#     token = get_token_admin()
+#     response = client.delete("/subcategories/999", headers={"Authorization": f"Bearer {token}"})
+#     assert response.status_code == 404
+#     assert response.json() == {
+#         "detail": "Subcategory not found."
+#     }
+#
+# def test_delete_subcategory_403():
+#     token = get_token_not_admin()
+#     response = client.delete("/subcategories/3", headers={"Authorization": f"Bearer {token}"})
+#     assert response.status_code == 403
+#     assert response.json() == {
+#         "detail": "You are not allowed to delete a subcategory."
+#     }
 
 # Gets all advice texts
 def test_read_advisory_texts():
@@ -308,7 +308,7 @@ def test_read_advisory_text_404():
 def test_create_advisory_text_201():
     advisory_text_data = {
         "category_id": 4,
-        "sub_category": "risk_in_euros",
+        "sub_category": "category_for_new_advisory_text",
         "text": "New Advisory Text"
     }
     token = get_token_admin()

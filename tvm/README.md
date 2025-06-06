@@ -69,7 +69,7 @@ This application requires a MySQL database to function. Furthermore, it is requi
 This projects includes a .env.dist, this document includes examples of possible entries. Create a file called '.env' At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
 
 ## Run the application
-First activate the venv by runnning:
+First activate the venv by running:
 ```bash
 .venv\Scripts\activate
 ```
@@ -92,4 +92,14 @@ python init_admin.py
 When the database is first created it is completely empty. To quickly import the predefined categories and texts run the following command from the src/tvm folder:
 ```bash
 python init_db.py
+```
+
+## Unit Testing
+For the unit tests, pytest is required to be used.
+You should create a new variant of the "tvm"-database and connect to this database through the connection string in the .env-file. This is to prevent the unit tests from messing with the data used in the actual application.
+The creation of a new database needs to be done manually, which is easiest through a service like *phpmyadmin*.
+
+By typing the following command in the src/tvm folder, it will set up the database and run the unit tests:
+```bash
+pytest
 ```

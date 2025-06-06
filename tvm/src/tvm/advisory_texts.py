@@ -324,7 +324,7 @@ def delete_text(
         db.delete(advisorytext)
         db.commit()
 
-        return Response(status_code=200, content=f"Advisory text and corresponding subcategory successfully deleted.")
+        return Response(status_code=204, content=f"Advisory text and corresponding subcategory successfully deleted.")
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete an advisory text.")
 
