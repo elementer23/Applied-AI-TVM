@@ -41,14 +41,13 @@ def get_db():
     finally:
         db.close()
 
+# Resets the database, used for unit testing
 def reset_database():
-    """
-    Truncate selected tables and reset auto-increment counters.
-    """
     tables_to_truncate = [
         "advisory_texts",
         "categories",
         "sub_categories"
+        # Add tables here that need to be truncated before testing
     ]
 
     with engine.connect() as conn:
@@ -66,6 +65,6 @@ def reset_database():
             print("Failed to reset database:", e)
             raise
 
-
+# Method that runs init_db.py automatically
 def run_init_db():
     subprocess.run(["python", "init_db.py"], check=True)

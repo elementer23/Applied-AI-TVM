@@ -25,6 +25,7 @@ def get_token_not_admin() -> str:
     return response.json()["access_token"]
 
 
+# This fixture activates before every test, resetting the database
 @pytest.fixture(scope="function", autouse=True)
 def prepare_database():
     reset_database()
