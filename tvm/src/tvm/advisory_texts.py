@@ -99,7 +99,7 @@ def delete_category(
         db.query(AdvisoryText).filter(AdvisoryText.category == category.name).delete()
         db.delete(category)
         db.commit()
-        return Response(status_code=204, content=f"successfully deleted the corresponding category.")
+        return Response(status_code=204)
     else:
         raise HTTPException(status_code=403, detail="You are not allowed to delete a category.")
 
