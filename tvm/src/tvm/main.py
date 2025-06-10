@@ -4,6 +4,7 @@ import warnings
 from fastapi import FastAPI
 
 from db import get_db
+from filter import filter_service
 
 from starlette.middleware.cors import CORSMiddleware
 
@@ -57,11 +58,17 @@ def run(data: InputData, current_user: User = Depends(get_current_user), db: Ses
         'input': data.input,
     }
 
-    try:
-        result = Tvm().crew().kickoff(inputs=inputs)
-        ai_response = result.raw
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+    # Check if the input is insurance related using the filter service
+    is_insurance_related = filter_service.screen_query(data.input)
+
+    if not is_insurance_related:
+        ai_response = "Sorry, ik kan alleen helpen bij het omzetten van adviesteksten. Stuur alstublieft alleen een adviestekst die u wilt omzetten."
+    else:
+        try:
+            result = Tvm().crew().kickoff(inputs=inputs)
+            ai_response = result.raw
+        except Exception as e:
+            raise Exception(f"An error occurred while running the crew: {e}")
 
     conversation = None
     conversation_created = False
