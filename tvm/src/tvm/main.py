@@ -7,7 +7,7 @@ from db import get_db
 
 from starlette.middleware.cors import CORSMiddleware
 
-from tvm.crew import Tvm
+from crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
