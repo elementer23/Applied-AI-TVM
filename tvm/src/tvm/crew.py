@@ -53,13 +53,6 @@ class Tvm():
         )
 
     @task
-    def research(self) -> Task:
-        return Task(
-            config=self.tasks_config['research'],
-            agent=self.reader()
-        )
-
-    @task
     def get_available_categories(self) -> Task:
         """Simple task to get all available categories and subcategories"""
         return Task(
@@ -72,24 +65,40 @@ class Tvm():
             expected_output="A JSON structure containing all categories and their subcategories from the database.",
             agent=self.reader()
         )
+    @task
+    def research(self) -> Task:
+        return Task(
+            description="Read the entire input and extract the necessary data for the writer. Look at {input}",
+            expected_output="""Inventaris
+            Per category, welk soort advies.
+            Eigen risico
+            Verzekerd bedrag
+            Advies wordt opgevolgd
+            Reden dat advies niet wordt opgevolgd indien van toepassing
+            Overige context""",
+            agent=self.reader(),
+            context=[self.get_available_categories()]
+        )
 
     @task
     def decide_template_category(self) -> Task:
         return Task(
             description="""
                 Analyze the research context and available categories to determine which advisory 
-                text best fits the client's needs.
+                text(s) best fits the client's needs.
 
                 Steps:
                 1. Review the available categories and subcategories from the previous task
                 2. Analyze the research context to understand the client's situation
-                3. Choose the most appropriate category and subcategory combination
+                3. For every category, decide which sub-category is most appropriate, if any.
 
-                Output EXACTLY this JSON format:
+                Per category, output EXACTLY this JSON format:
                 {
                     "category": "exact_category_name_from_database",
                     "sub_category": "exact_sub_category_name_from_database"
                 }
+
+                if you can't find an appropriate sub-category for a category, fill in null instead.
 
                 Make sure the values match exactly what was retrieved from the database.
                 """,
@@ -114,8 +123,9 @@ class Tvm():
                 - You MUST return the actual text content, not SQL statements
                 - If no exact match found, the tool will show available alternatives
                 - Handle any partial matches appropriately
+                - If a sub_category is marked as null, do NOT try to run the tool.
                 """,
-            expected_output="The complete Dutch advisory text template from the advisory_texts.text column.",
+            expected_output="The complete Dutch advisory text template(s) from the advisory_texts.text column.",
             agent=self.db_specialist(),
             context=[self.decide_template_category()]
         )
@@ -124,10 +134,10 @@ class Tvm():
     def fill_in_template(self) -> Task:
         return Task(
             description="""
-                Fill in the advisory template with specific information from the research context.
+                Fill in the advisory template(s) with specific information from the research context.
 
                 PROCESS:
-                1. Take the template text retrieved from the database
+                1. Take the template text(s) retrieved from the database
                 2. Look for placeholder variables (marked as '[variable_name]') and replace them with the appropriate value.
                 3. Areas in parenthesis '()' are a choice, the options being seperated by a '/' character. You must keep ONLY the text before OR after the slash within the area in parenthesis.
                 4. Replace placeholders with appropriate values from research context
@@ -137,10 +147,12 @@ class Tvm():
                 If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
 
                 CRITICAL:
+                - If a category is missing a template, fill in: 'Over dit deel is geen advies gegeven.'
                 - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
                 - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
                 - if [volgt_advies_op] is false, replace with: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
                 REQUIREMENTS:
+                - Mark every template by the category it belongs to.
                 - Output must be in Dutch
                 - Must use the database template as the foundation
                 - All placeholders must be replaced with realistic values

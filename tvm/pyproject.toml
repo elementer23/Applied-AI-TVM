@@ -34,3 +34,7 @@ type = "crew"
 dev = [
     "pytest>=8.4.0",
 ]
+[tool.pytest.ini_options]
+testpaths = [
+    "src/tvm/test"
+]
