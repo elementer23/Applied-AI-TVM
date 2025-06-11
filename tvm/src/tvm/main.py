@@ -8,7 +8,7 @@ from filter import filter_service
 
 from starlette.middleware.cors import CORSMiddleware
 
-from tvm.crew import Tvm
+from crew import Tvm
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
