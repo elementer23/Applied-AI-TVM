@@ -108,6 +108,10 @@ def test_read_users_me_401():
     assert response.status_code == 401
 
 # Verify token
+def test_verify_user_token_200():
+    token = get_token_admin()
+    response = client.get(f"/verify-token/{token}", headers = {"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
 
 # Get all users
 def test_list_users_200():
