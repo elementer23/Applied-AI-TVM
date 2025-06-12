@@ -5,6 +5,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from tools.db_tool import advisory_db_tool
 from tools.category_tool import category_tool
+from tvm.tools.db_multiple_text_tool import multi_advisory_db_tool
 
 
 @CrewBase
@@ -68,7 +69,7 @@ class Tvm():
             You always retrieve the actual text content from the database, never SQL statements. You understand this table structure perfectly.""",
             verbose=True,
             llm=self.default_crew_llm(),
-            tools=[advisory_db_tool],
+            tools=[advisory_db_tool,multi_advisory_db_tool],
         )
 
     def manager(self) -> Agent:
@@ -125,7 +126,7 @@ class Tvm():
                     "sub_category": "exact_sub_category_name_from_database"
                 }
 
-                if you can't find an appropriate sub-category for a category, fill in null instead.
+                if you can't find an appropriate sub-category for a category or there's insufficient data, fill in null instead.
 
                 Make sure the values match exactly what was retrieved from the database.
                 """,
@@ -138,19 +139,21 @@ class Tvm():
     def fetch_template_from_db(self) -> Task:
         return Task(
             description="""
-                Use the Advisory Database Tool to retrieve the ACTUAL advisory text from the advisory_texts table.
+                Use the Multi-Advisory Database Tool to retrieve the ACTUAL advisory text(s) from the advisory_texts table.
 
                 STEP-BY-STEP PROCESS:
-                1. Parse the JSON from the previous task to extract category and sub_category
-                2. Use the Advisory Database Tool with these EXACT parameters
-                3. The tool will query: SELECT text FROM advisory_texts WHERE category = ? AND sub_category = ?
-                4. Return the complete text content from the database
+                1. Parse the JSON from the previous task. It contains a list of objects, each with a `category` and `sub_category`.
+                2. Use the Multi-Advisory Database Tool, passing in the full list of {category, sub_category} pairs exactly as provided.
+                3. The tool will perform a single query using:
+                   SELECT text FROM advisory_texts WHERE (category, sub_category) IN ((...), (...), ...)
+                4. Return all matching advisory texts as a list, preserving the order of results from the database.
 
                 CRITICAL: 
                 - You MUST return the actual text content, not SQL statements
                 - If no exact match found, the tool will show available alternatives
                 - Handle any partial matches appropriately
                 - If a sub_category is marked as null, do NOT try to run the tool.
+                - You should return ALL the templates that were requested, not just one.
                 """,
             expected_output="The complete Dutch advisory text template(s) from the advisory_texts.text column.",
             agent=self.db_specialist(),
@@ -174,7 +177,7 @@ class Tvm():
                 If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
 
                 CRITICAL:
-                - If a category is missing a template, fill in: 'Over dit deel is geen advies gegeven.'
+                - If a category is missing a template or you cannot fill in all parameters, fill in: 'Over dit deel is geen advies gegeven.'
                 - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
                 - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
                 - if [volgt_advies_op] is false, replace with: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
