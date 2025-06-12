@@ -148,6 +148,53 @@ class Tvm():
         )
 
     @task
+    def analyze_template_requirements(self) -> Task:
+        return Task(
+            description="""
+                Analyze the retrieved template to identify any placeholders or choice options that cannot be clearly determined from the available context.
+
+                ANALYSIS PROCESS:
+                1. Examine the template text for all placeholders marked as '[variable_name]'
+                2. Look for choice areas in parenthesis '()' with options separated by '/'
+                3. Cross-reference with the research context to see what can be definitively filled in
+                4. Identify ALL template-specific elements that require explicit choices or clear information
+                5. DO NOT make assumptions - if something is not explicitly clear, mark it as needing clarification
+
+                WHAT TO IDENTIFY AS MISSING:
+                - Template placeholders where the exact value is not explicitly available
+                - Choice areas where the correct option cannot be definitively determined
+                - Any template variable that requires a specific choice but context is ambiguous
+                - Boolean choices (like [volgt_advies_op]) where true/false is not explicitly stated
+
+                STRICT RULE - NO ASSUMPTIONS:
+                - If research context doesn't explicitly state which choice to make, mark as missing
+                - If a placeholder value is not clearly provided, mark as missing
+                - If there's any doubt about which option to choose, mark as missing
+                - Only mark as "can be filled" if the information is explicitly and unambiguously available
+
+                WHAT NOT TO IDENTIFY AS MISSING:
+                - Standard client details that can use generic terms ("de klant", "uw bedrijf")
+                - Information that has reasonable defaults in professional contexts
+
+                OUTPUT FORMAT:
+                {
+                    "missing_template_options": [
+                        {
+                            "placeholder": "[placeholder_name]",
+                            "description": "wat exact onduidelijk is - welke keuze moet gemaakt worden",
+                            "options": "beschrijf de beschikbare opties indien van toepassing"
+                        }
+                    ],
+                    "can_proceed": true,
+                    "notes": "Extra opmerkingen over template analyse"
+                }
+                """,
+            expected_output="Een JSON analyse van alle onduidelijke template opties waar geen assumpties over gemaakt mogen worden.",
+            agent=self.reader(),
+            context=[self.research(), self.fetch_template_from_db()]
+        )
+
+    @task
     def fill_in_template(self) -> Task:
         return Task(
             description="""
@@ -155,27 +202,44 @@ class Tvm():
 
                 PROCESS:
                 1. Take the template text retrieved from the database
-                2. Look for placeholder variables (marked as '[variable_name]') and replace them with the appropriate value.
-                3. Areas in parenthesis '()' are a choice, the options being seperated by a '/' character. You must keep ONLY the text before OR after the slash within the area in parenthesis.
-                4. Replace placeholders with appropriate values from research context
-                5. Ensure proper Dutch grammar and sentence structure
-                6. Maintain the original template format and structure
+                2. Review the template analysis for any missing template options
+                3. Look for placeholder variables (marked as '[variable_name]') and replace them with appropriate values
+                4. Areas in parenthesis '()' are choices with options separated by '/'. You must keep ONLY the text before OR after the slash
+                5. Replace placeholders ONLY with information that is explicitly available from research context
+                6. For missing client information, use generic professional terms like "de klant", "uw bedrijf", "de situatie"
+                7. For template options marked as missing in the analysis, use: [ONTBREEKT: specifieke beschrijving uit analyse]
+                8. DO NOT make assumptions about choices - follow the analysis strictly
+                9. Ensure proper Dutch grammar and sentence structure
+                10. Maintain the original template format and structure
 
-                If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
+                STRICT RULE - NO ASSUMPTIONS:
+                - If the analysis marked something as missing, mark it as [ONTBREEKT: ...] 
+                - Do not guess or assume what choice should be made
+                - Only fill in what is explicitly clear from the context
+                - When in doubt, mark as missing rather than assume
 
-                CRITICAL:
-                - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
-                - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
-                - if [volgt_advies_op] is false, replace with: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
+                HANDLING MISSING TEMPLATE OPTIONS:
+                - Use the exact descriptions from the template analysis
+                - At the end, add "ONTBREKENDE TEMPLATE OPTIES:" section if analysis found missing options
+                - List each missing option with its description and available choices
+
+                CRITICAL TEMPLATE RULES:
+                - Parenthesis areas: keep ONLY text before OR after the slash, delete the other option and parentheses
+                - [volgt_advies_op] true: replace with 'mijn advies opvolgt.'
+                - [volgt_advies_op] false: replace with 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
+                - If [volgt_advies_op] is unclear from context, mark as [ONTBREEKT: keuze wel/niet advies opvolgen]
+
                 REQUIREMENTS:
                 - Output must be in Dutch
                 - Must use the database template as the foundation
-                - All placeholders must be replaced with realistic values
+                - Follow template analysis recommendations strictly
+                - No assumptions about unclear choices
+                - Professional language throughout
                 - Grammar and spelling must be correct
                 """,
-            expected_output="Een volledig ingevuld Nederlands adviessjabloon, gebaseerd op de database template, met alle variabelen vervangen door relevante informatie uit de research context.",
+            expected_output="Een Nederlands adviessjabloon waarbij alleen expliciete informatie is ingevuld en onduidelijke template keuzes zijn gemarkeerd als [ONTBREEKT: ...] met onderaan een overzicht van wat nog bepaald moet worden.",
             agent=self.writer(),
-            context=[self.research(), self.fetch_template_from_db()]
+            context=[self.research(), self.fetch_template_from_db(), self.analyze_template_requirements()]
         )
 
     @crew
