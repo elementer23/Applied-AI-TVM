@@ -1,5 +1,6 @@
-from crewai import Agent, Crew, Process, Task
-from crewai.project import CrewBase, agent, crew, task
+import os
+from crewai import Agent, Crew, Process, Task, LLM
+from crewai.project import CrewBase, agent, crew, task, llm
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from tools.db_tool import advisory_db_tool
@@ -10,15 +11,38 @@ from tools.category_tool import category_tool
 class Tvm():
     """Tvm crew"""
 
+    OPEN_API_BASE = os.environ.get("OPENAI_API_BASE")
+    OPEN_API_KEY = os.environ.get("OPENAI_API_KEY")
+    DEFAULT_LLM = os.environ.get("DEFAULT_LLM")
+    REASONING_LLM = os.environ.get("REASONING_LLM")
     agents: List[BaseAgent]
     tasks: List[Task]
+
+    @llm
+    def default_crew_llm(self) -> LLM:
+        return LLM(
+            model=self.DEFAULT_LLM,
+            temperature=0.5,
+            api_base=self.OPEN_API_BASE,
+            api_key=self.OPEN_API_KEY
+        )
+
+    @llm
+    def reasoning_llm(self) -> LLM:
+        return LLM(
+            model=self.REASONING_LLM,
+            temperature=0.5,
+            api_base=self.OPEN_API_BASE,
+            api_key=self.OPEN_API_KEY
+        )
 
     @agent
     def reader(self) -> Agent:
         return Agent(
             config=self.agents_config['reader'],
             verbose=True,
-            tools=[category_tool]
+            llm=self.reasoning_llm(),
+            tools=[category_tool],
         )
 
     @agent
@@ -26,6 +50,7 @@ class Tvm():
         return Agent(
             config=self.agents_config['writer'],
             verbose=True,
+            llm=self.reasoning_llm(),
         )
 
     @agent
@@ -42,6 +67,7 @@ class Tvm():
 
             You always retrieve the actual text content from the database, never SQL statements. You understand this table structure perfectly.""",
             verbose=True,
+            llm=self.default_crew_llm(),
             tools=[advisory_db_tool],
         )
 
@@ -50,6 +76,7 @@ class Tvm():
             config=self.agents_config['manager'],
             verbose=True,
             allow_delegation=True,
+            llm=self.reasoning_llm()
         )
 
     @task
