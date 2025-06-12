@@ -127,5 +127,54 @@ def test_list_users_401():
     }
 
 # Update user by ID
+def test_update_user_200():
+    updated_data = {
+        "username": "updated_username"
+    }
+    token = get_token_admin()
+    response = client.put("/users/1", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+
+def test_update_user_400():
+    updated_data = {
+        "username": "test_not_admin"
+    }
+    token = get_token_admin()
+    response = client.put("/users/1", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Username already taken"
+    }
+
+def test_update_user_404():
+    updated_data = {
+        "username": "updated_username"
+    }
+    token = get_token_admin()
+    response = client.put("/users/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "User not found"
+    }
 
 # Delete user by ID
+def test_delete_user_200():
+    token = get_token_admin()
+    response = client.delete("/users/2", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+
+def test_delete_user_400():
+    token = get_token_admin()
+    response = client.delete("/users/1", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Cannot delete your own account"
+    }
+
+def test_delete_user_404():
+    token = get_token_admin()
+    response = client.delete("/users/999", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "User not found"
+    }
