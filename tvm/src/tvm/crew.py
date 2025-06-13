@@ -152,7 +152,7 @@ class Tvm():
                 - You MUST return the actual text content, not SQL statements
                 - If no exact match found, the tool will show available alternatives
                 - Handle any partial matches appropriately
-                - If a sub_category is marked as null, do NOT try to run the tool.
+                - If a sub_category is marked as null, do NOT try to run the tool, instead return the text for that category as: {"category": "category", "text": null}
                 - You should return ALL the templates that were requested, not just one.
                 """,
             expected_output="The complete Dutch advisory text template(s) from the advisory_texts.text column.",
@@ -167,7 +167,7 @@ class Tvm():
                 Fill in the advisory template(s) with specific information from the research context.
 
                 PROCESS:
-                1. Take the template text(s) retrieved from the database
+                1. Take the template text(s) retrieved from the database.
                 2. Look for placeholder variables (marked as '[variable_name]') and replace them with the appropriate value.
                 3. Areas in parenthesis '()' are a choice, the options being seperated by a '/' character. You must keep ONLY the text before OR after the slash within the area in parenthesis.
                 4. Replace placeholders with appropriate values from research context
@@ -177,7 +177,8 @@ class Tvm():
                 If the template has no placeholders, adapt the content to be relevant to the specific client situation while keeping the template's core message.
 
                 CRITICAL:
-                - If a category is missing a template or you cannot fill in all parameters, fill in: 'Over dit deel is geen advies gegeven.'
+                - You MUST fill in an advisory template for every category, if a category had no template, fill in: 'Over dit deel is geen advies gegeven.'
+                - If a category's template is null or you cannot fill in all parameters, fill in: 'Over dit deel is geen advies gegeven.'
                 - When encountering an area in parenthesis, ONLY CARE ABOUT THE SLASH when deciding what to keep. You must delete either everything before or after the slash, within parenthesis
                 - if [volgt_advies_op] is true, replace with: 'mijn advies opvolgt.'
                 - if [volgt_advies_op] is false, replace with: 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'.
@@ -190,7 +191,7 @@ class Tvm():
                 """,
             expected_output="Een volledig ingevuld Nederlands adviessjabloon, gebaseerd op de database template, met alle variabelen vervangen door relevante informatie uit de research context.",
             agent=self.writer(),
-            context=[self.research(), self.fetch_template_from_db()]
+            context=[self.research(),self.get_available_categories(), self.fetch_template_from_db()]
         )
 
     @crew

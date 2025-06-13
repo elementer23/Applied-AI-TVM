@@ -41,7 +41,7 @@ class MultiAdvisoryDatabaseTool(BaseTool):
             ])
 
             sql = f"""
-                SELECT text
+                SELECT category, text
                 FROM advisory_texts
                 WHERE (category, sub_category) IN ({values_clause})
             """
@@ -55,6 +55,7 @@ class MultiAdvisoryDatabaseTool(BaseTool):
 
                 output = [
                     {
+                        "category": row.category,
                         "text": row.text
                     }
                     for row in rows
