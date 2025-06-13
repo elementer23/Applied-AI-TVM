@@ -1,10 +1,11 @@
-from models import Base, User
+from models import Base, User, Conversation, Message
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
 import subprocess
 from passlib.context import CryptContext
+from datetime import datetime
 
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
@@ -44,10 +45,9 @@ def get_db():
     finally:
         db.close()
 
-
-def initial_test_database():
+# Method that inserts the data from the initial database to prevent errors
+def insert_base_data():
     db = SessionLocal()
-
     admin_username = "test_user"
     if db.query(User).filter(User.username == admin_username).first():
         db.close()
@@ -62,8 +62,30 @@ def initial_test_database():
     hashed_user_password = get_password_hash("notadminpass")
     not_admin_user = User(username=not_admin_username, hashed_password=hashed_user_password, role="user")
 
+    new_conversation1 = Conversation(user_id=1, created_at=datetime.utcnow())
+    new_conversation2 = Conversation(user_id=1, created_at=datetime.utcnow())
+    new_conversation3 = Conversation(user_id=2, created_at=datetime.utcnow())
+    new_conversation4 = Conversation(user_id=2, created_at=datetime.utcnow())
+
+    new_message1 = Message(conversation_id=1, content="First test message", is_user_message=True, created_at=datetime.utcnow())
+    new_message2 = Message(conversation_id=1, content="AI response", is_user_message=False, created_at=datetime.utcnow())
+    new_message3 = Message(conversation_id=2, content="Another test message", is_user_message=True, created_at=datetime.utcnow())
+    new_message4 = Message(conversation_id=2, content="Another AI response", is_user_message=False, created_at=datetime.utcnow())
+    new_message5 = Message(conversation_id=3, content="A test message without a response", is_user_message=True, created_at=datetime.utcnow())
+    new_message6 = Message(conversation_id=4, content="Another test message without a response", is_user_message=True, created_at=datetime.utcnow())
+
     db.add(admin_user)
     db.add(not_admin_user)
+    db.add(new_conversation1)
+    db.add(new_conversation2)
+    db.add(new_conversation3)
+    db.add(new_conversation4)
+    db.add(new_message1)
+    db.add(new_message2)
+    db.add(new_message3)
+    db.add(new_message4)
+    db.add(new_message5)
+    db.add(new_message6)
     db.commit()
     db.close()
 
@@ -72,7 +94,10 @@ def reset_database():
     tables_to_truncate = [
         "advisory_texts",
         "categories",
-        "sub_categories"
+        "sub_categories",
+        "messages",
+        "conversations",
+        "users"
         # Add tables here that need to be truncated before testing
     ]
 
@@ -94,7 +119,6 @@ def reset_database():
 # Method that runs init_db.py automatically
 def run_init_db():
     subprocess.run(["python", "init_db.py"], check=True)
-
 
 def get_password_hash(password):
     return pwd_context.hash(password)
