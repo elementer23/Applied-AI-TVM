@@ -149,32 +149,42 @@ class Tvm():
 
     @task
     def analyze_template_requirements(self) -> Task:
+        """Analyze the template for missing options and placeholders that cannot be determined"""
         return Task(
             description="""
-                Analyze the retrieved template to identify any placeholders or choice options that cannot be clearly determined from the available context.
+                Analyze the retrieved template to identify any placeholders or choice options that cannot be clearly determined from: {input}
 
                 ANALYSIS PROCESS:
                 1. Examine the template text for all placeholders marked as '[variable_name]'
                 2. Look for choice areas in parenthesis '()' with options separated by '/'
                 3. Cross-reference with the research context to see what can be definitively filled in
-                4. Identify ALL template-specific elements that require explicit choices or clear information
-                5. DO NOT make assumptions - if something is not explicitly clear, mark it as needing clarification
+                4. Apply specific rules for common placeholders to minimize false positives
+                5. Only mark as missing if truly ambiguous after applying specific placeholder rules
+
+                SPECIFIC PLACEHOLDER RULES (to minimize false positives):
+                - [beleid_klant]: Look for any mention of risk amounts (euros) or risk minimization approach - if found, can be filled
+                - [eigen_risico]: Look for any mention of deductible amounts (euros) - there might be multiple so mention them all
+                - [verzekering_soort]: Look for "WA", "wettelijke aansprakelijkheid" or similar liability insurance terms - if found, can be filled
+                - [basis_verzekerd_bedrag]: Look for any monetary amounts mentioned (material damage, person damage, etc.) - if found, can be filled
+                - [volgt_advies_op]: Look for acceptation or rejection of advice, this is always "U heeft aangegeven dat u mijn advies opvolgt." or "U heeft aangegeven dat u mijn advies niet opvolgt, omdat ...". If not clear or its simply not there, mark as missing
 
                 WHAT TO IDENTIFY AS MISSING:
-                - Template placeholders where the exact value is not explicitly available
-                - Choice areas where the correct option cannot be definitively determined
-                - Any template variable that requires a specific choice but context is ambiguous
-                - Boolean choices (like [volgt_advies_op]) where true/false is not explicitly stated
+                - Template placeholders where NO relevant information exists in context (after applying specific rules)
+                - Choice areas where the correct option cannot be determined even with flexible interpretation
+                - Any template variable that requires a specific choice but context provides no guidance whatsoever
+                - Boolean choices where there's absolutely no indication of direction
 
-                STRICT RULE - NO ASSUMPTIONS:
-                - If research context doesn't explicitly state which choice to make, mark as missing
-                - If a placeholder value is not clearly provided, mark as missing
-                - If there's any doubt about which option to choose, mark as missing
-                - Only mark as "can be filled" if the information is explicitly and unambiguously available
+                STRICT RULE - MINIMIZE FALSE POSITIVES:
+                - Apply the specific placeholder rules first before marking as missing
+                - Look for partial matches or related information that could fill placeholders
+                - If research context has ANY relevant information for a placeholder, mark as "can be filled"
+                - Only mark as missing if there's truly NO relevant information available
+                - Be generous in interpretation - if there's a reasonable connection, don't mark as missing
 
                 WHAT NOT TO IDENTIFY AS MISSING:
                 - Standard client details that can use generic terms ("de klant", "uw bedrijf")
                 - Information that has reasonable defaults in professional contexts
+                - Placeholders where context provides related/relevant information (even if not exact match)
 
                 OUTPUT FORMAT:
                 {
@@ -189,7 +199,7 @@ class Tvm():
                     "notes": "Extra opmerkingen over template analyse"
                 }
                 """,
-            expected_output="Een JSON analyse van alle onduidelijke template opties waar geen assumpties over gemaakt mogen worden.",
+            expected_output="Een JSON analyse van alleen de werkelijk onduidelijke template opties waar absoluut geen relevante informatie voor beschikbaar is.",
             agent=self.reader(),
             context=[self.research(), self.fetch_template_from_db()]
         )
