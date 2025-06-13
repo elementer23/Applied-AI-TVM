@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from tvm.db import reset_database, run_init_db, initial_test_database
+from tvm.db import reset_database, run_init_db, insert_base_data
 import pytest
 from tvm.main import app
 
@@ -26,13 +26,14 @@ def get_token_not_admin() -> str:
 
 
 # This fixture activates before running all tests, adding the users to the database
-@pytest.fixture(scope="session", autouse=True)
-def build_database():
-    initial_test_database()
+# @pytest.fixture(scope="session", autouse=True)
+# def build_database():
+#     initial_test_database()
 
 
 # This fixture activates before every test, resetting the database
 @pytest.fixture(scope="function", autouse=True)
 def prepare_database():
     reset_database()
+    insert_base_data()
     run_init_db()

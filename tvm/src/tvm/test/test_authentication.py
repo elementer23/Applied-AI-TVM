@@ -136,7 +136,7 @@ def test_update_user_200():
         "username": "updated_username"
     }
     token = get_token_admin()
-    response = client.put("/users/1", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+    response = client.put("/users/3", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 def test_update_user_400():
@@ -144,7 +144,7 @@ def test_update_user_400():
         "username": "test_not_admin"
     }
     token = get_token_admin()
-    response = client.put("/users/1", json=updated_data, headers={"Authorization": f"Bearer {token}"})
+    response = client.put("/users/3", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
         "detail": "Username already taken"
