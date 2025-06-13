@@ -5,6 +5,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from tools.db_tool import advisory_db_tool
 from tools.category_tool import category_tool
+from tvm.tools.db_multiple_text_tool import multi_advisory_db_tool
 
 
 @CrewBase
@@ -68,7 +69,7 @@ class Tvm():
             You always retrieve the actual text content from the database, never SQL statements. You understand this table structure perfectly.""",
             verbose=True,
             llm=self.default_crew_llm(),
-            tools=[advisory_db_tool],
+            tools=[advisory_db_tool,multi_advisory_db_tool],
         )
 
     def manager(self) -> Agent:
@@ -77,13 +78,6 @@ class Tvm():
             verbose=True,
             allow_delegation=True,
             llm=self.reasoning_llm()
-        )
-
-    @task
-    def research(self) -> Task:
-        return Task(
-            config=self.tasks_config['research'],
-            agent=self.reader()
         )
 
     @task
@@ -99,24 +93,40 @@ class Tvm():
             expected_output="A JSON structure containing all categories and their subcategories from the database.",
             agent=self.reader()
         )
+    @task
+    def research(self) -> Task:
+        return Task(
+            description="Read the entire input and extract the necessary data for the writer. Look at {input}",
+            expected_output="""Inventaris
+            Per category, welk soort advies.
+            Eigen risico
+            Verzekerd bedrag
+            Advies wordt opgevolgd
+            Reden dat advies niet wordt opgevolgd indien van toepassing
+            Overige context""",
+            agent=self.reader(),
+            context=[self.get_available_categories()]
+        )
 
     @task
     def decide_template_category(self) -> Task:
         return Task(
             description="""
                 Analyze the research context and available categories to determine which advisory 
-                text best fits the client's needs.
+                text(s) best fits the client's needs.
 
                 Steps:
                 1. Review the available categories and subcategories from the previous task
                 2. Analyze the research context to understand the client's situation
-                3. Choose the most appropriate category and subcategory combination
+                3. For every category, decide which sub-category is most appropriate, if any.
 
-                Output EXACTLY this JSON format:
+                Per category, output EXACTLY this JSON format:
                 {
                     "category": "exact_category_name_from_database",
                     "sub_category": "exact_sub_category_name_from_database"
                 }
+
+                if you can't find an appropriate sub-category for a category or there's insufficient data, fill in null instead.
 
                 Make sure the values match exactly what was retrieved from the database.
                 """,
@@ -129,20 +139,23 @@ class Tvm():
     def fetch_template_from_db(self) -> Task:
         return Task(
             description="""
-                Use the Advisory Database Tool to retrieve the ACTUAL advisory text from the advisory_texts table.
+                Use the Multi-Advisory Database Tool to retrieve the ACTUAL advisory text(s) from the advisory_texts table.
 
                 STEP-BY-STEP PROCESS:
-                1. Parse the JSON from the previous task to extract category and sub_category
-                2. Use the Advisory Database Tool with these EXACT parameters
-                3. The tool will query: SELECT text FROM advisory_texts WHERE category = ? AND sub_category = ?
-                4. Return the complete text content from the database
+                1. Parse the JSON from the previous task. It contains a list of objects, each with a `category` and `sub_category`.
+                2. Use the Multi-Advisory Database Tool, passing in the full list of {category, sub_category} pairs exactly as provided.
+                3. The tool will perform a single query using:
+                   SELECT text FROM advisory_texts WHERE (category, sub_category) IN ((...), (...), ...)
+                4. Return all matching advisory texts as a list, preserving the order of results from the database.
 
                 CRITICAL: 
                 - You MUST return the actual text content, not SQL statements
                 - If no exact match found, the tool will show available alternatives
                 - Handle any partial matches appropriately
+                - If a sub_category is marked as null, do NOT try to run the tool, instead return the text for that category as: {"category": "category", "text": null}
+                - You should return ALL the templates that were requested, not just one.
                 """,
-            expected_output="The complete Dutch advisory text template from the advisory_texts.text column.",
+            expected_output="The complete Dutch advisory text template(s) from the advisory_texts.text column.",
             agent=self.db_specialist(),
             context=[self.decide_template_category()]
         )
@@ -208,10 +221,10 @@ class Tvm():
     def fill_in_template(self) -> Task:
         return Task(
             description="""
-                Fill in the advisory template with specific information from the research context.
+                Fill in the advisory template(s) with specific information from the research context.
 
                 PROCESS:
-                1. Take the template text retrieved from the database
+                1. Take the template text(s) retrieved from the database.
                 2. Review the template analysis for any missing template options
                 3. Look for placeholder variables (marked as '[variable_name]') and replace them with appropriate values
                 4. Areas in parenthesis '()' are choices with options separated by '/'. You must keep ONLY the text before OR after the slash
@@ -234,12 +247,15 @@ class Tvm():
                 - List each missing option with its description and available choices
 
                 CRITICAL TEMPLATE RULES:
+                - You MUST fill in an advisory template for every category, if a category had no template, fill in: 'Over dit deel is geen advies gegeven.'
+                - If a category's template is null or you cannot fill in all parameters, fill in: 'Over dit deel is geen advies gegeven.'
                 - Parenthesis areas: keep ONLY text before OR after the slash, delete the other option and parentheses
                 - [volgt_advies_op] true: replace with 'mijn advies opvolgt.'
                 - [volgt_advies_op] false: replace with 'niet mijn advies opvolgt, omdat u (reden_niet_opvolgen). Wij willen u erop wijzen dat het accepteren van dit risico mogelijke gevolgen kan hebben voor uw financiële reserves. In het ergste geval zou uw bedrijfscontinuïteit in gevaar kunnen komen. U bent zich hiervan bewust en accepteert deze risico's.'
                 - If [volgt_advies_op] is unclear from context, mark as [ONTBREEKT: keuze wel/niet advies opvolgen]
 
                 REQUIREMENTS:
+                - Mark every template by the category it belongs to.
                 - Output must be in Dutch
                 - Must use the database template as the foundation
                 - Follow template analysis recommendations strictly
@@ -249,7 +265,7 @@ class Tvm():
                 """,
             expected_output="Een Nederlands adviessjabloon waarbij alleen expliciete informatie is ingevuld en onduidelijke template keuzes zijn gemarkeerd als [ONTBREEKT: ...] met onderaan een overzicht van wat nog bepaald moet worden.",
             agent=self.writer(),
-            context=[self.research(), self.fetch_template_from_db(), self.analyze_template_requirements()]
+            context=[self.research(),self.get_available_categories(), self.fetch_template_from_db(), self.analyze_template_requirements()]
         )
 
     @crew
