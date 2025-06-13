@@ -67,18 +67,12 @@ def insert_base_data():
     new_conversation3 = Conversation(user_id=2, created_at=datetime.utcnow())
     new_conversation4 = Conversation(user_id=2, created_at=datetime.utcnow())
 
-    new_message1 = Message(conversation_id=1, content="First test message", is_user_message=True,
-                           created_at=datetime.utcnow())
-    new_message2 = Message(conversation_id=1, content="AI response", is_user_message=False,
-                           created_at=datetime.utcnow())
-    new_message3 = Message(conversation_id=2, content="Another test message", is_user_message=True,
-                           created_at=datetime.utcnow())
-    new_message4 = Message(conversation_id=2, content="Another AI response", is_user_message=False,
-                           created_at=datetime.utcnow())
-    new_message5 = Message(conversation_id=3, content="A test message without a response", is_user_message=True,
-                           created_at=datetime.utcnow())
-    new_message6 = Message(conversation_id=4, content="Another test message without a response", is_user_message=True,
-                           created_at=datetime.utcnow())
+    new_message1 = Message(conversation_id=1, content="First test message", is_user_message=True, created_at=datetime.utcnow())
+    new_message2 = Message(conversation_id=1, content="AI response", is_user_message=False, created_at=datetime.utcnow())
+    new_message3 = Message(conversation_id=2, content="Another test message", is_user_message=True, created_at=datetime.utcnow())
+    new_message4 = Message(conversation_id=2, content="Another AI response", is_user_message=False, created_at=datetime.utcnow())
+    new_message5 = Message(conversation_id=3, content="A test message without a response", is_user_message=True, created_at=datetime.utcnow())
+    new_message6 = Message(conversation_id=4, content="Another test message without a response", is_user_message=True, created_at=datetime.utcnow())
 
     db.add(admin_user)
     db.add(not_admin_user)
