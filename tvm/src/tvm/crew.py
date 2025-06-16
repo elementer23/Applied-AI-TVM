@@ -5,7 +5,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from tools.db_tool import advisory_db_tool
 from tools.category_tool import category_tool
-from tvm.tools.db_multiple_text_tool import multi_advisory_db_tool
+from tools.db_multiple_text_tool import multi_advisory_db_tool
 
 
 @CrewBase

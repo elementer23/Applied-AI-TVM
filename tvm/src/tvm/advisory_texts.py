@@ -17,7 +17,7 @@ def read_categories(
     """
     categories = db.query(Category).all()
     if not categories:
-        raise HTTPException(status_code=404, detail="No categories found.")
+        raise HTTPException(status_code=404, detail="Geen categorieën gevonden.")
     return categories
 
 # Get the category with the given ID
@@ -31,7 +31,7 @@ def read_category(
     """
     category = db.get(Category, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found.")
+        raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
     return category
 
 # Create a new category
@@ -47,14 +47,14 @@ def create_category(
     if current_user.role == "admin":
         category = db.query(Category).filter_by(name=category_create.name).first()
         if category:
-            raise HTTPException(status_code=400, detail="This category already exists.")
+            raise HTTPException(status_code=400, detail="Deze categorie bestaat al.")
         new_category = Category(name=category_create.name)
         db.add(new_category)
         db.commit()
         db.refresh(new_category)
-        return Response(status_code=201, content=f"Category {new_category.name} successfully created.")
+        return Response(status_code=201, content=f"Categorie {new_category.name} succesvol gecreëerd.")
     else:
-        raise HTTPException(status_code=403, detail="You are not allowed to create a category.")
+        raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een categorie te creëren.")
 
 # Update the category with the given ID
 @app.put("/categories/{category_id}", tags=["Advisory Texts"])
@@ -70,16 +70,16 @@ def update_category(
     if current_user.role == "admin":
         category = db.get(Category, category_id)
         if not category:
-            raise HTTPException(status_code=404, detail="Category not found.")
+            raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
         old_category_name = category.name
         category.name  = category_update.name
 
         db.query(AdvisoryText).filter(AdvisoryText.category == old_category_name).update({"category": category.name})
         db.commit()
         db.refresh(category)
-        return Response(status_code=200, content=f"Category {category.name} successfully updated.")
+        return Response(status_code=200, content=f"Categorie {category.name} succesvol geüpdatet.")
     else:
-        raise HTTPException(status_code=403, detail="You are not allowed to update a category.")
+        raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een categorie te updaten.")
 
 # Delete the category with the given ID
 @app.delete("/categories/{category_id}", tags=["Advisory Texts"])
@@ -94,14 +94,14 @@ def delete_category(
     if current_user.role == "admin":
         category = db.get(Category, category_id)
         if not category:
-            raise HTTPException(status_code=404, detail="Category not found.")
+            raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
         db.query(SubCategory).filter(SubCategory.category_id == category_id).delete()
         db.query(AdvisoryText).filter(AdvisoryText.category == category.name).delete()
         db.delete(category)
         db.commit()
         return Response(status_code=204)
     else:
-        raise HTTPException(status_code=403, detail="You are not allowed to delete a category.")
+        raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een categorie te verwijderen.")
 
 # Get all subcategories
 @app.get("/subcategories/", response_model=List[SubCategoryResponse], tags=["Advisory Texts"])
@@ -113,7 +113,7 @@ def read_subcategories(
     """
     subcategories = db.query(SubCategory).all()
     if not subcategories:
-        raise HTTPException(status_code=404, detail="No subcategories found.")
+        raise HTTPException(status_code=404, detail="Geen subcategorieën gevonden.")
     return subcategories
 
 
@@ -128,11 +128,11 @@ def read_subcategories_by_category(
     """
     category = db.get(Category, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found.")
+        raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
 
     subcategories = db.query(SubCategory).filter(SubCategory.category_id == category_id).all()
     if not subcategories:
-        raise HTTPException(status_code=404, detail="No subcategories found for this category.")
+        raise HTTPException(status_code=404, detail="Geen subcategorieën voor deze categorie gevonden.")
 
     return subcategories
 
@@ -148,7 +148,7 @@ def read_subcategory(
     """
     subcategory = db.query(SubCategory).filter(SubCategory.id == subcategory_id).first()
     if not subcategory:
-        raise HTTPException(status_code=404, detail="Subcategory not found.")
+        raise HTTPException(status_code=404, detail="Subcategorie niet gevonden.")
     return subcategory
 
 # Create a new subcategory (Currently disabled, as it isn't supposed to be used)
@@ -227,7 +227,7 @@ def read_texts(
     """
     advisorytexts = db.query(AdvisoryText).all()
     if not advisorytexts:
-        raise HTTPException(status_code=404, detail="No advice texts found.")
+        raise HTTPException(status_code=404, detail="Geen adviesteksten gevonden.")
     return advisorytexts
 
 # Gets the advice text with the given composite ID's
@@ -241,7 +241,7 @@ def read_text(
     """
     advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
     if not advisorytext:
-        raise HTTPException(status_code=404, detail="Advice text not found.")
+        raise HTTPException(status_code=404, detail="Adviestekst niet gevonden.")
     return advisorytext
 
 # Create new advice text
@@ -262,9 +262,9 @@ def create_text(
             SubCategory.category_id == advisory_text_create.category_id
         ).first()
         if advice:
-            raise HTTPException(status_code=400, detail="This text already exists.")
+            raise HTTPException(status_code=400, detail="De gegeven tekst bestaat al.")
         if sub_category:
-            raise HTTPException(status_code=400, detail="this subcategory already exists")
+            raise HTTPException(status_code=400, detail="De gegeven subcategorie bestaat al voor deze categorie.")
         new_advice = AdvisoryText(text=advisory_text_create.text, category=category.name, sub_category=advisory_text_create.sub_category)
         new_subcategory = SubCategory(name=advisory_text_create.sub_category, category_id=category.id)
         db.add(new_advice)
@@ -272,9 +272,9 @@ def create_text(
         db.commit()
         db.refresh(new_advice)
         db.refresh(new_subcategory)
-        return Response(status_code=201, content=f"AdvisoryText {new_advice.text} successfully created.")
+        return Response(status_code=201, content=f"Adviestekst {new_advice.text} succesvol gecreëerd.")
     else:
-        raise HTTPException(status_code=403, detail="You are not allowed to create an advisory text.")
+        raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een adviestekst te creëren.")
 
 # Edits the advice text with the given ID
 @app.put("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
@@ -290,13 +290,13 @@ def update_text(
     if current_user.role == "admin":
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
-            raise HTTPException(status_code=404, detail="Advice text not found.")
+            raise HTTPException(status_code=404, detail="Adviestekst niet gevonden.")
         advisorytext.text = advisory_text_update.text
         db.commit()
         db.refresh(advisorytext)
-        return Response(status_code=200, content=f"Advisory Text {advisorytext.text} successfully updated.")
+        return Response(status_code=200, content=f"Adviestekst {advisorytext.text} is succesvol geüpdatet.")
     else:
-        raise HTTPException(status_code=403, detail="You are not allowed to update an advisory text.")
+        raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een adviestekst te updaten.")
 
 # Deletes the advice text with the given ID
 @app.delete("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
@@ -311,7 +311,7 @@ def delete_text(
     if current_user.role == "admin":
         advisorytext = db.query(AdvisoryText).filter(AdvisoryText.id == text_id).first()
         if not advisorytext:
-            raise HTTPException(status_code=404, detail="Advice text not found.")
+            raise HTTPException(status_code=404, detail="Adviestekst niet gevonden.")
         category = db.query(Category).filter(Category.name == advisorytext.category).first()
         if category:
             subcategory = db.query(SubCategory).filter(
@@ -326,7 +326,7 @@ def delete_text(
 
         return Response(status_code=204)
     else:
-        raise HTTPException(status_code=403, detail="You are not allowed to delete an advisory text.")
+        raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een adviestekst te verwijderen.")
 
 
 @app.get("/advisorytexts/subcategory/{subcategory_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
@@ -339,11 +339,11 @@ def read_text_by_subcategory(
     """
     subcategory = db.query(SubCategory).filter(SubCategory.id == subcategory_id).first()
     if not subcategory:
-        raise HTTPException(status_code=404, detail="Subcategory not found.")
+        raise HTTPException(status_code=404, detail="Subcategorie niet gevonden.")
 
     category = db.get(Category, subcategory.category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found.")
+        raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
 
     advisorytext = db.query(AdvisoryText).filter(
         AdvisoryText.category == category.name,
@@ -351,6 +351,6 @@ def read_text_by_subcategory(
     ).first()
 
     if not advisorytext:
-        raise HTTPException(status_code=404, detail="No advisory text found for this subcategory.")
+        raise HTTPException(status_code=404, detail="Geen adviestekst gevonden voor deze subcategorie.")
 
     return advisorytext
