@@ -50,7 +50,11 @@ app.add_middleware(
 
 
 @app.post("/run", tags=["Chat"])
-def run(data: InputData, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def run(
+        data: InputData,
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
     """
     Send a message and run the crew.
     """
@@ -136,6 +140,7 @@ def train():
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
 
+
 def replay():
     """
     Replay the crew execution from a specific task.
@@ -145,6 +150,7 @@ def replay():
 
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
+
 
 def test():
     """

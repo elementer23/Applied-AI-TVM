@@ -13,6 +13,7 @@ import embedchain.loaders.mysql as mysql_loader_module
 _original_init = mysql_loader_module.MySQLLoader.__init__
 load_dotenv()
 
+
 def patched_init(self, config):
     url = config.get("url")
     if url:
@@ -38,6 +39,7 @@ Base.metadata.create_all(bind=engine)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -45,20 +47,21 @@ def get_db():
     finally:
         db.close()
 
+
 # Method that inserts the data from the initial database to prevent errors
 def insert_base_data():
     db = SessionLocal()
     admin_username = "test_user"
     if db.query(User).filter(User.username == admin_username).first():
         db.close()
-        return
+        return None
     hashed_admin_password = get_password_hash("test_pass")
     admin_user = User(username=admin_username, hashed_password=hashed_admin_password, role="admin")
 
     not_admin_username = "test_not_admin"
     if db.query(User).filter(User.username == not_admin_username).first():
         db.close()
-        return
+        return None
     hashed_user_password = get_password_hash("notadminpass")
     not_admin_user = User(username=not_admin_username, hashed_password=hashed_user_password, role="user")
 
@@ -89,6 +92,7 @@ def insert_base_data():
     db.commit()
     db.close()
 
+
 # Resets the database, used for unit testing
 def reset_database():
     tables_to_truncate = [
@@ -116,9 +120,11 @@ def reset_database():
             print("Failed to reset database:", e)
             raise
 
+
 # Method that runs init_db.py automatically
 def run_init_db():
     subprocess.run(["python", "init_db.py"], check=True)
+
 
 def get_password_hash(password):
     return pwd_context.hash(password)
