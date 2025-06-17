@@ -9,6 +9,7 @@ class InsuranceFilterService:
     OPEN_API_KEY = os.environ.get("OPENAI_API_KEY")
     DEFAULT_LLM = os.environ.get("DEFAULT_LLM")
 
+
     def default_llm(self) -> LLM:
         return LLM(
             model=self.DEFAULT_LLM,
@@ -16,6 +17,7 @@ class InsuranceFilterService:
             api_base=self.OPEN_API_BASE,
             api_key=self.OPEN_API_KEY,
         )
+
 
     def __init__(self):
         self.screener_agent = Agent(
@@ -25,6 +27,7 @@ class InsuranceFilterService:
             llm=self.default_llm(),
             verbose=True
         )
+
 
     def screen_query(self, query: str) -> bool:
         try:

@@ -157,7 +157,10 @@ from main import app, get_db
 
 
 @app.post("/token", tags=["Authentication"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)
+):
     """
     Login with username and password to get access token and refresh token
     """
@@ -177,7 +180,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 
 @app.post("/token/refresh", tags=["Authentication"])
-async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+async def refresh_access_token(
+        request: RefreshTokenRequest,
+        db: Session = Depends(get_db)
+):
     """
     Refresh access token using refresh token
     """
@@ -203,7 +209,10 @@ async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depen
 
 
 @app.post("/token/revoke", tags=["Authentication"])
-async def revoke_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+async def revoke_token(
+        request: RefreshTokenRequest,
+        db: Session = Depends(get_db)
+):
     """
     Revoke refresh token
     """
@@ -212,7 +221,10 @@ async def revoke_token(request: RefreshTokenRequest, db: Session = Depends(get_d
 
 
 @app.post("/logout", tags=["Authentication"])
-async def logout(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def logout(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
     """
     Logout and revoke all refresh tokens
     """
@@ -221,8 +233,13 @@ async def logout(current_user: User = Depends(get_current_user), db: Session = D
 
 
 @app.post("/users/", tags=["Authentication"])
-def create_user(username: str, password: str, role: str = "user", db: Session = Depends(get_db),
-                admin: User = Depends(get_current_admin_user)):
+def create_user(
+        username: str,
+        password: str,
+        role: str = "user",
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     Create a new user based on username and password
     """
@@ -238,7 +255,9 @@ def create_user(username: str, password: str, role: str = "user", db: Session = 
 
 
 @app.get("/me", tags=["Authentication"])
-def read_users_me(current_user: User = Depends(get_current_user)):
+def read_users_me(
+        current_user: User = Depends(get_current_user)
+):
     """
     Returns username and role
     """
@@ -246,7 +265,9 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 
 
 @app.get("/verify-token/{token}", tags=["Authentication"])
-async def verify_user_token(token: str):
+async def verify_user_token(
+        token: str
+):
     """
     Verify access token
     """
@@ -255,7 +276,10 @@ async def verify_user_token(token: str):
 
 
 @app.get("/users/", tags=["Authentication"], response_model=list[UserResponse])
-def list_users(db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+def list_users(
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     List all users
     """
@@ -268,7 +292,12 @@ def list_users(db: Session = Depends(get_db), admin: User = Depends(get_current_
 
 
 @app.put("/users/{user_id}", tags=["Authentication"], response_model=UserResponse)
-def update_user(user_id: int, user_update: UserUpdateRequest, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+def update_user(
+        user_id: int,
+        user_update: UserUpdateRequest,
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     Update user by ID
     """
@@ -298,7 +327,11 @@ def update_user(user_id: int, user_update: UserUpdateRequest, db: Session = Depe
 
 
 @app.delete("/users/{user_id}", tags=["Authentication"])
-def delete_user(user_id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+def delete_user(
+        user_id: int,
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     Delete user by ID
     """

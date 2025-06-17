@@ -20,6 +20,7 @@ def read_categories(
         raise HTTPException(status_code=404, detail="Geen categorieën gevonden.")
     return categories
 
+
 # Get the category with the given ID
 @app.get("/categories/{category_id}", response_model=CategoryResponse, tags=["Advisory Texts"])
 def read_category(
@@ -33,6 +34,7 @@ def read_category(
     if not category:
         raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
     return category
+
 
 # Create a new category
 @app.post("/categories/", tags=["Advisory Texts"])
@@ -55,6 +57,7 @@ def create_category(
         return Response(status_code=201, content=f"Categorie {new_category.name} succesvol gecreëerd.")
     else:
         raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een categorie te creëren.")
+
 
 # Update the category with the given ID
 @app.put("/categories/{category_id}", tags=["Advisory Texts"])
@@ -81,6 +84,7 @@ def update_category(
     else:
         raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een categorie te updaten.")
 
+
 # Delete the category with the given ID
 @app.delete("/categories/{category_id}", tags=["Advisory Texts"])
 def delete_category(
@@ -102,6 +106,7 @@ def delete_category(
         return Response(status_code=204)
     else:
         raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een categorie te verwijderen.")
+
 
 # Get all subcategories
 @app.get("/subcategories/", response_model=List[SubCategoryResponse], tags=["Advisory Texts"])
@@ -151,71 +156,6 @@ def read_subcategory(
         raise HTTPException(status_code=404, detail="Subcategorie niet gevonden.")
     return subcategory
 
-# Create a new subcategory (Currently disabled, as it isn't supposed to be used)
-# @app.post("/subcategories/", tags=["Advisory Texts"])
-# def create_subcategory(
-#         subcategory_create: SubCategoryModel,
-#         db: Session = Depends(get_db),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     """
-#     Creates a new subcategory of risk willingness.
-#     """
-#     if current_user.role == "admin":
-#         subcategory = db.get(SubCategory, subcategory_create.name)
-#         if subcategory:
-#             raise HTTPException(status_code=400, detail="This subcategory already exists.")
-#         new_subcategory = SubCategory(name=subcategory_create.name)
-#         db.add(new_subcategory)
-#         db.commit()
-#         db.refresh(new_subcategory)
-#         return Response(status_code=201, content=f"Subcategory {new_subcategory.name} successfully created.")
-#     else:
-#         raise HTTPException(status_code=403, detail="You are not allowed to create a subcategory.")
-
-# Update the subcategory with the given ID
-# @app.put("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
-# def update_subcategory(
-#         subcategory_id: int,
-#         subcategory_update: SubCategoryModel,
-#         db: Session = Depends(get_db),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     """
-#     Update a specific subcategory of risk willingness for the given ID.
-#     """
-#     if current_user.role == "admin":
-#         subcategory = db.get(SubCategory, subcategory_id)
-#         if not subcategory:
-#             return HTTPException(status_code=404, detail="Subcategory not found.")
-#         subcategory.name = subcategory_update.name
-#         db.commit()
-#         db.refresh(subcategory)
-#         return Response(status_code=200, content=f"Subcategory {subcategory.name} successfully updated.")
-#     else:
-#         raise HTTPException(status_code=403, detail="You are not allowed to update a subcategory.")
-
-# Delete the subcategory with the given ID
-# @app.delete("/subcategories/{subcategory_id}", tags=["Advisory Texts"])
-# def delete_category(
-#         subcategory_id: int,
-#         db: Session = Depends(get_db),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     """
-#     Delete the subcategory of risk willingness corresponding to the given ID.
-#     """
-#     if current_user.role == "admin":
-#         subcategory = db.get(SubCategory, subcategory_id)
-#         if not subcategory:
-#             return HTTPException(status_code=404, detail="Subcategory not found.")
-#         db.delete(subcategory)
-#         db.commit()
-#         db.refresh(subcategory)
-#         return Response(status_code=204)
-#     else:
-#         raise HTTPException(status_code=403, detail="You are not allowed to delete a subcategory.")
-
 
 # Gets all advice texts
 @app.get("/advisorytexts/", response_model=List[AdvisoryTextResponse], tags=["Advisory Texts"])
@@ -230,6 +170,7 @@ def read_texts(
         raise HTTPException(status_code=404, detail="Geen adviesteksten gevonden.")
     return advisorytexts
 
+
 # Gets the advice text with the given composite ID's
 @app.get("/advisorytexts/id={text_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
 def read_text(
@@ -243,6 +184,7 @@ def read_text(
     if not advisorytext:
         raise HTTPException(status_code=404, detail="Adviestekst niet gevonden.")
     return advisorytext
+
 
 # Create new advice text
 @app.post("/advisorytexts/", tags=["Advisory Texts"])
@@ -276,6 +218,7 @@ def create_text(
     else:
         raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een adviestekst te creëren.")
 
+
 # Edits the advice text with the given ID
 @app.put("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
 def update_text(
@@ -297,6 +240,7 @@ def update_text(
         return Response(status_code=200, content=f"Adviestekst {advisorytext.text} is succesvol geüpdatet.")
     else:
         raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een adviestekst te updaten.")
+
 
 # Deletes the advice text with the given ID
 @app.delete("/advisorytexts/id={text_id}", tags=["Advisory Texts"])
