@@ -11,6 +11,9 @@
 		},
 		{
 			"name": "damage_to_passengers"
+		},
+		{
+			"name": "juridical_claims"
 		}
 	],
 	"subcategories": [
