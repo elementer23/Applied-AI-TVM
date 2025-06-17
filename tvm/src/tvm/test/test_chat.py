@@ -28,7 +28,7 @@ def test_get_conversation_messages_404():
     response = client.get("/conversations/999/messages", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Conversation not found"
+        "detail": "Gesprek niet gevonden"
     }
 
 # Delete conversation
@@ -42,7 +42,7 @@ def test_delete_conversation_404():
     response = client.delete("/conversations/999", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Conversation not found"
+        "detail": "Gesprek niet gevonden"
     }
 
 # Create conversation

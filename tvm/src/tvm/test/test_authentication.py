@@ -19,7 +19,7 @@ def test_login_400():
     response = client.post("/token", data=login_data)
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "Incorrect username or password"
+        "detail": "Incorrecte gebruikersnaam of wachtwoord"
     }
 
 # Refresh access token
@@ -83,7 +83,7 @@ def test_create_user_400():
     response = client.post("/users/?username=test_user&password=test_pass", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "Username already registered"
+        "detail": "Gebruikersnaam bestaat al!"
     }
 
 # Read user "me"
@@ -144,7 +144,7 @@ def test_update_user_400():
     response = client.put("/users/1", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "Username already taken"
+        "detail": "Gebruikersnaam is al in gebruik"
     }
 
 def test_update_user_404():
@@ -155,7 +155,7 @@ def test_update_user_404():
     response = client.put("/users/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "User not found"
+        "detail": "Gebruiker niet gevonden"
     }
 
 # Delete user by ID
@@ -169,7 +169,7 @@ def test_delete_user_400():
     response = client.delete("/users/1", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "Cannot delete your own account"
+        "detail": "Het is niet mogelijk om je eigen account te verwijderen"
     }
 
 def test_delete_user_404():
@@ -177,5 +177,5 @@ def test_delete_user_404():
     response = client.delete("/users/999", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "User not found"
+        "detail": "Gebruiker niet gevonden"
     }

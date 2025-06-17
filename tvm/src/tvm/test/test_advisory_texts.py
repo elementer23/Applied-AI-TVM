@@ -27,7 +27,7 @@ def test_read_category_404():
     response = client.get("/categories/999")
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Category not found."
+        "detail": "Categorie niet gevonden."
     }
 
 # Create a new category
@@ -49,7 +49,7 @@ def test_create_category_400():
     response = client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "This category already exists."
+        "detail": "Deze categorie bestaat al."
     }
 
 def test_create_category_403():
@@ -61,7 +61,7 @@ def test_create_category_403():
     response = client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to create a category."
+        "detail": "U bent niet gerechtigd om een categorie te creëren."
     }
 
 # Update the category with the given ID
@@ -83,7 +83,7 @@ def test_update_category_404():
     response = client.put("/categories/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Category not found."
+        "detail": "Categorie niet gevonden."
     }
 
 def test_update_category_403():
@@ -95,7 +95,7 @@ def test_update_category_403():
     response = client.put("/categories/3", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to update a category."
+        "detail": "U bent niet gerechtigd om een categorie te updaten."
     }
 
 # Delete the category with the given ID
@@ -109,7 +109,7 @@ def test_delete_category_404():
     response = client.delete("/categories/999", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Category not found."
+        "detail": "Categorie niet gevonden."
     }
 
 def test_delete_category_403():
@@ -117,7 +117,7 @@ def test_delete_category_403():
     response = client.delete("/categories/3", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to delete a category."
+        "detail": "U bent niet gerechtigd om een categorie te verwijderen."
     }
 
 # Get all subcategories
@@ -160,7 +160,7 @@ def test_read_subcategory_404():
     response = client.get("/subcategories/999")
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Subcategory not found."
+        "detail": "Subcategorie niet gevonden."
     }
 
 # Create a new subcategory
@@ -301,7 +301,7 @@ def test_read_advisory_text_404():
     response = client.get("/advisorytexts/id=999")
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Advice text not found."
+        "detail": "Adviestekst niet gevonden."
     }
 
 # Create new advice text
@@ -327,7 +327,7 @@ def test_create_advisory_text_400():
     response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "This text already exists."
+        "detail": "De gegeven tekst bestaat al."
     }
 
 def test_create_advisory_text_403():
@@ -341,7 +341,7 @@ def test_create_advisory_text_403():
     response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to create an advisory text."
+        "detail": "U bent niet gerechtigd om een adviestekst te creëren."
     }
 
 # Edits the advice text with the given ID
@@ -367,7 +367,7 @@ def test_update_advisory_text_404():
     response = client.put("/advisorytexts/id=999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Advice text not found."
+        "detail": "Adviestekst niet gevonden."
     }
 
 def test_update_advisory_text_403():
@@ -381,7 +381,7 @@ def test_update_advisory_text_403():
     response = client.put("/advisorytexts/id=9", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to update an advisory text."
+        "detail": "U bent niet gerechtigd om een adviestekst te updaten."
     }
 
 # Deletes the advice text with the given ID
@@ -395,7 +395,7 @@ def test_delete_advisory_text_404():
     response = client.delete("/advisorytexts/id=999", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Advice text not found."
+        "detail": "Adviestekst niet gevonden."
     }
 
 def test_delete_advisory_text_403():
@@ -403,5 +403,5 @@ def test_delete_advisory_text_403():
     response = client.delete("/advisorytexts/id=6", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to delete an advisory text."
+        "detail": "U bent niet gerechtigd om een adviestekst te verwijderen."
     }
