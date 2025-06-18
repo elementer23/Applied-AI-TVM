@@ -1,4 +1,36 @@
+import asyncio
+
 from .test_main import *
+from tvm.authentication import get_current_user
+from tvm.db import get_db
+
+# Get_current_user
+def test_get_current_user_success():
+    token = get_token_admin()
+    user = client.get("/me", headers={"Authorization": f"Bearer {token}"})
+
+    db_gen = get_db()
+    db = next(db_gen)
+    try:
+        current_user = asyncio.run(get_current_user(token, db))
+        assert current_user.username == user.json()['username']
+    finally:
+        db_gen.close()
+
+
+def test_get_current_user_invalid_token():
+    token = "invalid_token"
+    user = client.get("/me", headers={"Authorization": f"Bearer {token}"})
+
+    assert user.status_code == 401
+    assert user.json()["detail"] == "Kon credentialen niet verifiëren"
+
+
+def test_get_current_user_no_token():
+    user = client.get("/me")
+
+    assert user.status_code == 401
+    assert user.json()["detail"] == "Not authenticated"
 
 
 # Get access token
