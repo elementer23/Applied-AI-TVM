@@ -58,6 +58,9 @@ jobs:
         SQL_CONNECTION=mysql+pymysql://test_user:test_password@127.0.0.1:3306/test_db
         SECRET=QWERTYUIOPASDFGHJKLZXCVBNM
         ORIGINS_CALL=*
+        OPENAI_API_KEY=QWERTYUIOPASDFGHJKLZXCVBNM
+        DEFAULT_LLM=openai/gpt-4.1-mini
+        REASONING_LLM=openai/gpt-4.1
         EOF
 
     - name: Run tests
