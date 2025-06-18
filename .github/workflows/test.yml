@@ -44,7 +44,7 @@ jobs:
     - name: Wait for MySQL to be ready
       run: |
         for i in {1..30}; do
-          if mysqladmin ping -h "127.0.0.1" -P 3306 -u root -p test_password --silent; then
+          if mysqladmin ping -h"127.0.0.1" -P3306 -uroot -ptest_password --silent; then
             echo "MySQL is ready!"
             break
           fi
@@ -63,4 +63,4 @@ jobs:
     - name: Run tests
       run: |
         cd tvm/src/tvm
-        pytest
+        uv run pytest
