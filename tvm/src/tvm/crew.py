@@ -5,7 +5,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from tools.db_tool import advisory_db_tool
 from tools.category_tool import category_tool
-from tvm.tools.db_multiple_text_tool import multi_advisory_db_tool
+from tools.db_multiple_text_tool import multi_advisory_db_tool
 
 
 @CrewBase
@@ -23,7 +23,7 @@ class Tvm():
     def default_crew_llm(self) -> LLM:
         return LLM(
             model=self.DEFAULT_LLM,
-            temperature=0.5,
+            temperature=0.0,
             api_base=self.OPEN_API_BASE,
             api_key=self.OPEN_API_KEY
         )
@@ -32,7 +32,7 @@ class Tvm():
     def reasoning_llm(self) -> LLM:
         return LLM(
             model=self.REASONING_LLM,
-            temperature=0.5,
+            temperature=0.0,
             api_base=self.OPEN_API_BASE,
             api_key=self.OPEN_API_KEY
         )

@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from db import get_db
 from filter import filter_service
+from filter_input_util import input_filter
 
 from starlette.middleware.cors import CORSMiddleware
 
@@ -54,8 +55,10 @@ def run(data: InputData, current_user: User = Depends(get_current_user), db: Ses
     """
     Send a message and run the crew.
     """
+
+    filtered_input = input_filter.filter_input(data.input)
     inputs = {
-        'input': data.input,
+        'input': filtered_input,
     }
 
     # Check if the input is insurance related using the filter service
