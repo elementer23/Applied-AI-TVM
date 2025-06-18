@@ -158,6 +158,15 @@ def test_verify_user_token_200():
     assert response.status_code == 200
 
 
+def test_verify_user_token_403():
+    token = "invalid token"
+    response = client.get(f"/verify-token/{token}", headers = {"Authorization": f"Bearer {token}"})
+    assert response.status_code == 403
+    assert response.json() == {
+        "detail": "Token is invalide of verlopen."
+    }
+
+
 # Get all users
 def test_list_users_200():
     token = get_token_admin()
@@ -165,7 +174,8 @@ def test_list_users_200():
     assert response.status_code == 200
     assert response.json() == [
         {"id": 1, "username": "test_user", "role": "admin"},
-        {"id": 2, "username": "test_not_admin", "role": "user"}
+        {"id": 2, "username": "test_not_admin", "role": "user"},
+        {"id": 3, "username": "user_to_delete", "role": "user"},
     ]
 
 
@@ -211,7 +221,7 @@ def test_update_user_404():
 # Delete user by ID
 def test_delete_user_200():
     token = get_token_admin()
-    response = client.delete("/users/2", headers={"Authorization": f"Bearer {token}"})
+    response = client.delete("/users/3", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 

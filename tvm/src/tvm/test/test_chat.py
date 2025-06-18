@@ -11,6 +11,15 @@ def test_get_conversation_messages_404():
     }
 
 
+def test_get_conversation_messages_404_no_messages():
+    token = get_token_admin()
+    response = client.get("/conversations/5/messages", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Geen bericht(en) voor dit gesprek"
+    }
+
+
 # Delete conversation
 def test_delete_conversation_200():
     token = get_token_admin()
