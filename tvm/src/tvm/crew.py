@@ -24,7 +24,7 @@ class Tvm():
     def default_crew_llm(self) -> LLM:
         return LLM(
             model=self.DEFAULT_LLM,
-            temperature=0.5,
+            temperature=0.0,
             api_base=self.OPEN_API_BASE,
             api_key=self.OPEN_API_KEY
         )
@@ -34,7 +34,7 @@ class Tvm():
     def reasoning_llm(self) -> LLM:
         return LLM(
             model=self.REASONING_LLM,
-            temperature=0.5,
+            temperature=0.0,
             api_base=self.OPEN_API_BASE,
             api_key=self.OPEN_API_KEY
         )
