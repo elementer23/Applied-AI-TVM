@@ -24,8 +24,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-        volumes:
-          - .github/workflows/mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql:ro
 
     steps:
     - uses: actions/checkout@v4
@@ -53,6 +51,16 @@ jobs:
           echo "Waiting for MySQL..."
           sleep 2
         done
+        
+    - name: Initialize MySQL with UTF8MB4 and InnoDB
+      run: |
+        cat <<'EOF' > mysql-init.sql
+        ALTER DATABASE test_db CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+        SET GLOBAL default_storage_engine = 'InnoDB';
+        SET SESSION default_storage_engine = 'InnoDB';
+        EOF
+
+        mysql -h 127.0.0.1 -P3306 -uroot -ptest_password test_db < mysql-init.sql
 
     - name: Create .env file
       run: |
