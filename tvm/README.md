@@ -103,3 +103,8 @@ By typing the following command in the src/tvm folder, it will set up the databa
 ```bash
 pytest
 ```
+
+In case running "pytest" gives an error, you can alternatively run the following command:
+```bash
+uv run pytest
+```

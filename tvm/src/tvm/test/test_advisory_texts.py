@@ -160,6 +160,41 @@ def test_read_subcategories():
     assert response.json() == expected_data
 
 
+# Get all subcategories by category ID
+def test_read_subcategories_by_category_200():
+    expected_data = [
+        {"id": 1, "category_id": 1, "name": "minrisk"},
+        {"id": 2, "category_id": 1, "name": "risk_in_euros"},
+        {"id": 3, "category_id": 1, "name": "deviate_from_identification"},
+        {"id": 4, "category_id": 1, "name": "identify_by_risk"}
+    ]
+    response = client.get("/categories/1/subcategories")
+    assert response.status_code == 200
+    assert response.json() == expected_data
+
+
+def test_read_subcategories_by_category_404_no_category():
+    response = client.get("/categories/999/subcategories")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Categorie niet gevonden."
+    }
+
+
+def test_read_subcategories_by_category_404_no_subcategories():
+    category_data = {
+        "name": "new_category"
+    }
+    token = get_token_admin()
+    client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
+
+    response = client.get("/categories/5/subcategories")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Geen subcategorieën voor deze categorie gevonden."
+    }
+
+
 # Get the subcategory with the given ID
 def test_read_subcategory_200():
     response = client.get("/subcategories/1")
@@ -239,7 +274,7 @@ def test_create_advisory_text_201():
     assert response.status_code == 201
 
 
-def test_create_advisory_text_400():
+def test_create_advisory_text_400_text():
     advisory_text_data = {
         "category_id": 4,
         "sub_category": "risk_in_euros",
@@ -251,6 +286,21 @@ def test_create_advisory_text_400():
     assert response.status_code == 400
     assert response.json() == {
         "detail": "De gegeven tekst bestaat al."
+    }
+
+
+def test_create_advisory_text_400_subcategory():
+    advisory_text_data = {
+        "category_id": 1,
+        "sub_category": "minrisk",
+        "text": "Nieuwe tekst"
+    }
+    token = get_token_admin()
+
+    response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "De gegeven subcategorie bestaat al voor deze categorie."
     }
 
 
@@ -334,4 +384,26 @@ def test_delete_advisory_text_403():
     assert response.status_code == 403
     assert response.json() == {
         "detail": "U bent niet gerechtigd om een adviestekst te verwijderen."
+    }
+
+
+# Get advisory text by subcategory ID
+def test_read_text_by_subcategory_200():
+    response = client.get("/advisorytexts/subcategory/10")
+    assert response.status_code == 200
+    expected_data = {
+        "id": 10,
+        "category": "loss_of_personal_items",
+        "sub_category": "risk_in_euros",
+        "text": "Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van 10.000 wilt en kunt dragen. Mijn advies is om (geen diefstal bagage dekking af te sluiten./ een diefstal bagage dekking af te sluiten. Voor het verzekerde bedrag en het eigen risico verwijs ik u naar de polis.) U geeft aan dat u [volg_advies_op]"
+    }
+
+    assert response.json() == expected_data
+
+
+def test_read_text_by_subcategory_404_no_subcategory():
+    response = client.get("/advisorytexts/subcategory/999")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Subcategorie niet gevonden."
     }

@@ -171,7 +171,7 @@ def read_texts(
     return advisorytexts
 
 
-# Gets the advice text with the given composite ID's
+# Gets the advice text with the given ID
 @app.get("/advisorytexts/id={text_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
 def read_text(
         text_id: int,
@@ -273,6 +273,7 @@ def delete_text(
         raise HTTPException(status_code=403, detail="U bent niet gerechtigd om een adviestekst te verwijderen.")
 
 
+# Get advisory text by subcategory ID
 @app.get("/advisorytexts/subcategory/{subcategory_id}", response_model=AdvisoryTextResponse, tags=["Advisory Texts"])
 def read_text_by_subcategory(
         subcategory_id: int,
