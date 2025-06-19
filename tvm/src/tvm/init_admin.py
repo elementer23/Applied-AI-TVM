@@ -16,6 +16,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def create_admin():
     db = SessionLocal()
 
@@ -25,7 +26,7 @@ def create_admin():
     if db.query(User).filter(User.username == username).first():
         print("Username already exists.")
         db.close()
-        return
+        return None
 
     password = getpass("Enter admin password: ").strip()
     confirm_password = getpass("Confirm password: ").strip()
@@ -33,7 +34,7 @@ def create_admin():
     if password != confirm_password:
         print("Passwords do not match.")
         db.close()
-        return
+        return None
 
     hashed_password = get_password_hash(password)
     admin_user = User(username=username, hashed_password=hashed_password, role="admin")

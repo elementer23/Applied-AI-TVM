@@ -3,7 +3,9 @@ from tvm.db import reset_database, run_init_db, insert_base_data
 import pytest
 from tvm.main import app
 
+
 client = TestClient(app)
+
 
 def get_token_admin() -> str:
     login = {
@@ -23,12 +25,6 @@ def get_token_not_admin() -> str:
     response = client.post("/token", data=login, headers={"Content-Type": "application/x-www-form-urlencoded"})
     assert response.status_code == 200
     return response.json()["access_token"]
-
-
-# This fixture activates before running all tests, adding the users to the database
-# @pytest.fixture(scope="session", autouse=True)
-# def build_database():
-#     initial_test_database()
 
 
 # This fixture activates before every test, resetting the database
