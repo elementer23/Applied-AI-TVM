@@ -21,6 +21,9 @@ async def get_user_conversations(
         Conversation.user_id == current_user.id
     ).order_by(Conversation.created_at.desc()).all()
 
+    if not conversations:
+        raise HTTPException(status_code=404, detail="Geen gesprekken gevonden!")
+
     return conversations
 
 
@@ -41,12 +44,15 @@ async def get_conversation_messages(
     if not conversation:
         raise HTTPException(
             status_code=404,
-            detail="Conversation not found"
+            detail="Gesprek niet gevonden"
         )
 
     messages = db.query(Message).filter(
         Message.conversation_id == conversation_id
     ).order_by(Message.created_at.asc()).all()
+
+    if not messages:
+        raise HTTPException(status_code=404, detail="Geen bericht(en) voor dit gesprek")
 
     return messages
 
@@ -68,13 +74,13 @@ async def delete_conversation(
     if not conversation:
         raise HTTPException(
             status_code=404,
-            detail="Conversation not found"
+            detail="Gesprek niet gevonden"
         )
 
     db.delete(conversation)
     db.commit()
 
-    return {"message": f"Conversation {conversation_id} deleted successfully"}
+    return {"message": f"Gesprek {conversation_id} succesvol verwijderd!"}
 
 
 @app.post("/conversations", response_model=ConversationResponse, tags=["Chat"])
@@ -112,7 +118,7 @@ async def delete_all_conversations(
     conversation_count = len(conversations)
 
     if conversation_count == 0:
-        return {"message": "No conversations found"}
+        return {"message": "Geen gesprekken gevonden"}
 
     for conversation in conversations:
         db.delete(conversation)
@@ -120,5 +126,5 @@ async def delete_all_conversations(
     db.commit()
 
     return {
-        "message": f"All {conversation_count} conversations deleted successfully",
+        "message": f"Alle {conversation_count} gesprekken succesvol verwijderd!",
     }

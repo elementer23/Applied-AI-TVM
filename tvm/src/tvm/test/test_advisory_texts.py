@@ -1,5 +1,6 @@
 from .test_main import *
 
+
 # Get all categories
 def test_read_categories():
     response = client.get("/categories/")
@@ -14,6 +15,7 @@ def test_read_categories():
 
     assert response.json() == expected_data
 
+
 # Get the category with the given ID
 def test_read_category_200():
     response = client.get("/categories/1")
@@ -23,12 +25,14 @@ def test_read_category_200():
         "name": "damage_to_third_parties"
     }
 
+
 def test_read_category_404():
     response = client.get("/categories/999")
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Category not found."
+        "detail": "Categorie niet gevonden."
     }
+
 
 # Create a new category
 def test_create_category_201():
@@ -40,6 +44,7 @@ def test_create_category_201():
     response = client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 201
 
+
 def test_create_category_400():
     category_data = {
         "name": "damage_by_standstill"
@@ -49,8 +54,9 @@ def test_create_category_400():
     response = client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "This category already exists."
+        "detail": "Deze categorie bestaat al."
     }
+
 
 def test_create_category_403():
     category_data = {
@@ -61,8 +67,9 @@ def test_create_category_403():
     response = client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to create a category."
+        "detail": "U bent niet gerechtigd om een categorie te creëren."
     }
+
 
 # Update the category with the given ID
 def test_update_category_200():
@@ -74,6 +81,7 @@ def test_update_category_200():
     response = client.put("/categories/1", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
+
 def test_update_category_404():
     updated_data = {
         "name": "damage_to_fourth_parties"
@@ -83,8 +91,9 @@ def test_update_category_404():
     response = client.put("/categories/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Category not found."
+        "detail": "Categorie niet gevonden."
     }
+
 
 def test_update_category_403():
     updated_data = {
@@ -95,8 +104,9 @@ def test_update_category_403():
     response = client.put("/categories/3", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to update a category."
+        "detail": "U bent niet gerechtigd om een categorie te updaten."
     }
+
 
 # Delete the category with the given ID
 def test_delete_category_204():
@@ -104,21 +114,24 @@ def test_delete_category_204():
     response = client.delete("/categories/2", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 204
 
+
 def test_delete_category_404():
     token = get_token_admin()
     response = client.delete("/categories/999", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Category not found."
+        "detail": "Categorie niet gevonden."
     }
+
 
 def test_delete_category_403():
     token = get_token_not_admin()
     response = client.delete("/categories/3", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to delete a category."
+        "detail": "U bent niet gerechtigd om een categorie te verwijderen."
     }
+
 
 # Get all subcategories
 def test_read_subcategories():
@@ -146,6 +159,42 @@ def test_read_subcategories():
 
     assert response.json() == expected_data
 
+
+# Get all subcategories by category ID
+def test_read_subcategories_by_category_200():
+    expected_data = [
+        {"id": 1, "category_id": 1, "name": "minrisk"},
+        {"id": 2, "category_id": 1, "name": "risk_in_euros"},
+        {"id": 3, "category_id": 1, "name": "deviate_from_identification"},
+        {"id": 4, "category_id": 1, "name": "identify_by_risk"}
+    ]
+    response = client.get("/categories/1/subcategories")
+    assert response.status_code == 200
+    assert response.json() == expected_data
+
+
+def test_read_subcategories_by_category_404_no_category():
+    response = client.get("/categories/999/subcategories")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Categorie niet gevonden."
+    }
+
+
+def test_read_subcategories_by_category_404_no_subcategories():
+    category_data = {
+        "name": "new_category"
+    }
+    token = get_token_admin()
+    client.post("/categories/", json=category_data, headers={"Authorization": f"Bearer {token}"})
+
+    response = client.get("/categories/5/subcategories")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Geen subcategorieën voor deze categorie gevonden."
+    }
+
+
 # Get the subcategory with the given ID
 def test_read_subcategory_200():
     response = client.get("/subcategories/1")
@@ -156,109 +205,14 @@ def test_read_subcategory_200():
         "name": "minrisk"
     }
 
+
 def test_read_subcategory_404():
     response = client.get("/subcategories/999")
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Subcategory not found."
+        "detail": "Subcategorie niet gevonden."
     }
 
-# Create a new subcategory
-# def test_create_subcategory_201():
-#     subcategory_data = {
-#         "category_id": 1,
-#         "name": "new_subcategory"
-#     }
-#     token = get_token_admin()
-#
-#     response = client.post("/subcategories/", json=subcategory_data, headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 201
-#
-# def test_create_subcategory_400():
-#     subcategory_data = {
-#         "category_id": 1,
-#         "name": "risk_in_euros"
-#     }
-#     token = get_token_admin()
-#
-#     response = client.post("/subcategories/", json=subcategory_data, headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 400
-#     assert response.json() == {
-#         "detail": "This subcategory already exists."
-#     }
-#
-# def test_create_subcategory_403():
-#     subcategory_data = {
-#         "category_id": 3,
-#         "name": "new_subcategory"
-#     }
-#     token = get_token_not_admin()
-#
-#     response = client.post("/subcategories/", json=subcategory_data, headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 403
-#     assert response.json() == {
-#         "detail": "You are not allowed to create a subcategory."
-#     }
-
-# Update the subcategory with the given ID
-# def test_update_subcategory_200():
-#     updated_data = {
-#         "category_id": 2,
-#         "name": "identify_another_way"
-#     }
-#     token = get_token_admin()
-#
-#     response = client.put("/subcategories/8", json=updated_data, headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 200
-#
-# def test_update_subcategory_404():
-#     updated_data = {
-#         "category_id": 2,
-#         "name": "identify_another_way"
-#     }
-#     token = get_token_admin()
-#
-#     response = client.put("/subcategories/999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 404
-#     assert response.json() == {
-#         "detail": "Subcategory not found."
-#     }
-#
-# def test_update_subcategory_403():
-#     updated_data = {
-#         "category_id": 2,
-#         "name": "identify_another_way"
-#     }
-#     token = get_token_not_admin()
-#
-#     response = client.put("/subcategories/8", json=updated_data, headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 403
-#     assert response.json() == {
-#         "detail": "You are not allowed to update a subcategory."
-#     }
-#
-# # Delete the subcategory with the given ID
-# def test_delete_subcategory_204():
-#     token = get_token_admin()
-#     response = client.delete("/subcategories/13", headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 204
-#
-#
-# def test_delete_subcategory_404():
-#     token = get_token_admin()
-#     response = client.delete("/subcategories/999", headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 404
-#     assert response.json() == {
-#         "detail": "Subcategory not found."
-#     }
-#
-# def test_delete_subcategory_403():
-#     token = get_token_not_admin()
-#     response = client.delete("/subcategories/3", headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 403
-#     assert response.json() == {
-#         "detail": "You are not allowed to delete a subcategory."
-#     }
 
 # Gets all advice texts
 def test_read_advisory_texts():
@@ -286,7 +240,8 @@ def test_read_advisory_texts():
 
     assert response.json() == expected_data
 
-# Gets the advice text with the given composite ID's
+
+# Gets the advice text with the given ID
 def test_read_advisory_text_200():
     response = client.get("/advisorytexts/id=1")
     assert response.status_code == 200
@@ -297,12 +252,14 @@ def test_read_advisory_text_200():
         "text": "Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om alle trekkers + opleggers WA volledig casco te verzekeren. Voor het verzekerde bedrag, gebaseerd op [basis_verzekerd_bedrag] en het (eigen risico van [eigen_risico]./standaard eigen risico.) Deze bedragen vindt u terug op de polis. U geeft aan dat u [volg_advies_op]\n\nOnderstaande dekkingen zijn standaard meeverzekerd onder een bepaalde dekking. Hierover wordt niet geadviseerd.\nWA:\n- Hulpverlening bij ziekte of ongeval\n- Gladheidsbestrijding\n- Vervoer van gevaarlijke stoffen\n- Werkrisico\n- Gemonteerd werkmaterieel\nBrand, brand/diefstal, beperkt casco of volledig casco:\n- Berging en repatriÃ«ring\nVolledig Casco:\n- Bergingskosten na pech"
     }
 
+
 def test_read_advisory_text_404():
     response = client.get("/advisorytexts/id=999")
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Advice text not found."
+        "detail": "Adviestekst niet gevonden."
     }
+
 
 # Create new advice text
 def test_create_advisory_text_201():
@@ -316,7 +273,8 @@ def test_create_advisory_text_201():
     response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 201
 
-def test_create_advisory_text_400():
+
+def test_create_advisory_text_400_text():
     advisory_text_data = {
         "category_id": 4,
         "sub_category": "risk_in_euros",
@@ -327,8 +285,24 @@ def test_create_advisory_text_400():
     response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "This text already exists."
+        "detail": "De gegeven tekst bestaat al."
     }
+
+
+def test_create_advisory_text_400_subcategory():
+    advisory_text_data = {
+        "category_id": 1,
+        "sub_category": "minrisk",
+        "text": "Nieuwe tekst"
+    }
+    token = get_token_admin()
+
+    response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "De gegeven subcategorie bestaat al voor deze categorie."
+    }
+
 
 def test_create_advisory_text_403():
     advisory_text_data = {
@@ -341,8 +315,9 @@ def test_create_advisory_text_403():
     response = client.post("/advisorytexts/", json=advisory_text_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to create an advisory text."
+        "detail": "U bent niet gerechtigd om een adviestekst te creëren."
     }
+
 
 # Edits the advice text with the given ID
 def test_update_advisory_text_200():
@@ -356,6 +331,7 @@ def test_update_advisory_text_200():
     response = client.put("/advisorytexts/id=9", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
+
 def test_update_advisory_text_404():
     updated_data = {
         "category_id": 3,
@@ -367,8 +343,9 @@ def test_update_advisory_text_404():
     response = client.put("/advisorytexts/id=999", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Advice text not found."
+        "detail": "Adviestekst niet gevonden."
     }
+
 
 def test_update_advisory_text_403():
     updated_data = {
@@ -381,8 +358,9 @@ def test_update_advisory_text_403():
     response = client.put("/advisorytexts/id=9", json=updated_data, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to update an advisory text."
+        "detail": "U bent niet gerechtigd om een adviestekst te updaten."
     }
+
 
 # Deletes the advice text with the given ID
 def test_delete_advisory_text_204():
@@ -390,18 +368,42 @@ def test_delete_advisory_text_204():
     response = client.delete("/advisorytexts/id=6", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 204
 
+
 def test_delete_advisory_text_404():
     token = get_token_admin()
     response = client.delete("/advisorytexts/id=999", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Advice text not found."
+        "detail": "Adviestekst niet gevonden."
     }
+
 
 def test_delete_advisory_text_403():
     token = get_token_not_admin()
     response = client.delete("/advisorytexts/id=6", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You are not allowed to delete an advisory text."
+        "detail": "U bent niet gerechtigd om een adviestekst te verwijderen."
+    }
+
+
+# Get advisory text by subcategory ID
+def test_read_text_by_subcategory_200():
+    response = client.get("/advisorytexts/subcategory/10")
+    assert response.status_code == 200
+    expected_data = {
+        "id": 10,
+        "category": "loss_of_personal_items",
+        "sub_category": "risk_in_euros",
+        "text": "Tijdens de inventarisatie hebben wij vastgesteld dat u risico's tot een bedrag van 10.000 wilt en kunt dragen. Mijn advies is om (geen diefstal bagage dekking af te sluiten./ een diefstal bagage dekking af te sluiten. Voor het verzekerde bedrag en het eigen risico verwijs ik u naar de polis.) U geeft aan dat u [volg_advies_op]"
+    }
+
+    assert response.json() == expected_data
+
+
+def test_read_text_by_subcategory_404_no_subcategory():
+    response = client.get("/advisorytexts/subcategory/999")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Subcategorie niet gevonden."
     }

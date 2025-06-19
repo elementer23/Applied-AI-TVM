@@ -115,7 +115,7 @@ def revoke_all_user_tokens(db: Session, user_id: int):
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Kon credentialen niet verifiëren",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -136,7 +136,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 async def get_current_admin_user(current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(status_code=403, detail="Niet de benodigde toestemming")
     return current_user
 
 
@@ -147,23 +147,26 @@ def verify_token(token: str = Depends(oauth2_scheme)):
         token_type: str = payload.get("type")
 
         if username is None or token_type != "access":
-            raise HTTPException(status_code=403, detail="Token is invalid or expired.")
+            raise HTTPException(status_code=403, detail="Token is invalide of verlopen.")
         return payload
     except JWTError:
-        raise HTTPException(status_code=403, detail="Token is invalid or expired.")
+        raise HTTPException(status_code=403, detail="Token is invalide of verlopen.")
 
 
 from main import app, get_db
 
 
 @app.post("/token", tags=["Authentication"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)
+):
     """
     Login with username and password to get access token and refresh token
     """
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(status_code=400, detail="Incorrecte gebruikersnaam of wachtwoord")
 
     access_token = create_access_token(data={"sub": user.username})
     refresh_token = create_refresh_token(db, user.id)
@@ -177,7 +180,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 
 @app.post("/token/refresh", tags=["Authentication"])
-async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+async def refresh_access_token(
+        request: RefreshTokenRequest,
+        db: Session = Depends(get_db)
+):
     """
     Refresh access token using refresh token
     """
@@ -185,7 +191,7 @@ async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depen
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired refresh token"
+            detail="Invalide of verlopen refresh token"
         )
 
     # Create new access token
@@ -203,32 +209,43 @@ async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depen
 
 
 @app.post("/token/revoke", tags=["Authentication"])
-async def revoke_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+async def revoke_token(
+        request: RefreshTokenRequest,
+        db: Session = Depends(get_db)
+):
     """
     Revoke refresh token
     """
     revoke_refresh_token(db, request.refresh_token)
-    return {"message": "Token revoked successfully"}
+    return {"message": "Token is succesvol ingetrokken"}
 
 
 @app.post("/logout", tags=["Authentication"])
-async def logout(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def logout(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
     """
     Logout and revoke all refresh tokens
     """
     deleted_count = revoke_all_user_tokens(db, current_user.id)
-    return {"message": f"Logged out successfully. Removed {deleted_count} tokens."}
+    return {"message": f"Succesvol uitgelogd. {deleted_count} aantal tokens weggehaald."}
 
 
 @app.post("/users/", tags=["Authentication"])
-def create_user(username: str, password: str, role: str = "user", db: Session = Depends(get_db),
-                admin: User = Depends(get_current_admin_user)):
+def create_user(
+        username: str,
+        password: str,
+        role: str = "user",
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     Create a new user based on username and password
     """
     user = db.query(User).filter(User.username == username).first()
     if user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(status_code=400, detail="Gebruikersnaam bestaat al!")
     hashed_password = get_password_hash(password)
     new_user = User(username=username, hashed_password=hashed_password, role=role)
     db.add(new_user)
@@ -238,7 +255,9 @@ def create_user(username: str, password: str, role: str = "user", db: Session = 
 
 
 @app.get("/me", tags=["Authentication"])
-def read_users_me(current_user: User = Depends(get_current_user)):
+def read_users_me(
+        current_user: User = Depends(get_current_user)
+):
     """
     Returns username and role
     """
@@ -246,37 +265,51 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 
 
 @app.get("/verify-token/{token}", tags=["Authentication"])
-async def verify_user_token(token: str):
+async def verify_user_token(
+        token: str
+):
     """
     Verify access token
     """
     verify_token(token=token)
-    return {"message": "Token is valid"}
+    return {"message": "Token is valide"}
 
 
 @app.get("/users/", tags=["Authentication"], response_model=list[UserResponse])
-def list_users(db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+def list_users(
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     List all users
     """
     users = db.query(User).all()
+
+    if not users:
+        raise HTTPException(status_code=404, detail="Geen gebruikers gevonden")
+
     return users
 
 
 @app.put("/users/{user_id}", tags=["Authentication"], response_model=UserResponse)
-def update_user(user_id: int, user_update: UserUpdateRequest, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+def update_user(
+        user_id: int,
+        user_update: UserUpdateRequest,
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     Update user by ID
     """
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Gebruiker niet gevonden")
 
     # Check if username is being changed and if it's already taken
     if user_update.username and user_update.username != user.username:
         existing_user = db.query(User).filter(User.username == user_update.username).first()
         if existing_user:
-            raise HTTPException(status_code=400, detail="Username already taken")
+            raise HTTPException(status_code=400, detail="Gebruikersnaam is al in gebruik")
         user.username = user_update.username
 
     # Update password if provided
@@ -294,17 +327,21 @@ def update_user(user_id: int, user_update: UserUpdateRequest, db: Session = Depe
 
 
 @app.delete("/users/{user_id}", tags=["Authentication"])
-def delete_user(user_id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
+def delete_user(
+        user_id: int,
+        db: Session = Depends(get_db),
+        admin: User = Depends(get_current_admin_user)
+):
     """
     Delete user by ID
     """
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Gebruiker niet gevonden")
 
     # Prevent admin from deleting themselves
     if user.id == admin.id:
-        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+        raise HTTPException(status_code=400, detail="Het is niet mogelijk om je eigen account te verwijderen")
 
     # Revoke all refresh tokens before deletion
     revoke_all_user_tokens(db, user.id)
@@ -313,4 +350,4 @@ def delete_user(user_id: int, db: Session = Depends(get_db), admin: User = Depen
     db.delete(user)
     db.commit()
 
-    return {"message": f"User '{user.username}' deleted successfully"}
+    return {"message": f"Gebruiker '{user.username}' succesvol verwijderd!"}
