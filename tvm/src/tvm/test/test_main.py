@@ -32,4 +32,3 @@ def get_token_not_admin() -> str:
 def prepare_database():
     reset_database()
     insert_base_data()
-    run_init_db()
