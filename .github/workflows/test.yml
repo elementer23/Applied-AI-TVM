@@ -20,12 +20,12 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --character-set-server=utf8mb4
-          --collation-server=utf8mb4_unicode_ci
           --health-cmd="mysqladmin ping"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+        volumes:
+          - .github/workflows/mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql:ro
 
     steps:
     - uses: actions/checkout@v4
