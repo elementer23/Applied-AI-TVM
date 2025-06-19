@@ -15,7 +15,7 @@ WA:
 - Werkrisico
 - Gemonteerd werkmaterieel
 Brand, brand/diefstal, beperkt casco of volledig casco:
-- Berging en repatriÃ«ring
+- Berging en repatriëring
 Volledig Casco:
 - Bergingskosten na pech"""
 
