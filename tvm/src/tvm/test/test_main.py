@@ -27,13 +27,6 @@ def get_token_not_admin() -> str:
     return response.json()["access_token"]
 
 
-def run_without_access_token():
-    data = {"input": "Test input"}
-    response = client.post("/run",json=data
-    )
-    assert response.status_code == 401
-
-
 # This fixture activates before every test, resetting the database
 @pytest.fixture(scope="function", autouse=True)
 def prepare_database():
