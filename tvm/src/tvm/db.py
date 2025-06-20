@@ -10,9 +10,9 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
 
+
 _original_init = mysql_loader_module.MySQLLoader.__init__
 load_dotenv()
-
 
 def patched_init(self, config):
     url = config.get("url")

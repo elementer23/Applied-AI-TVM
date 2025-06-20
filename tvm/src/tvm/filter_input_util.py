@@ -2,6 +2,7 @@ import re
 import unicodedata
 from textwrap import dedent
 
+
 class FilterInputUtility:
     """Simple utility to normalize the input that is given by the user, while talking to the Agent"""
 

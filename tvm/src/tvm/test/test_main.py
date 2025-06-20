@@ -6,7 +6,6 @@ from tvm.main import app
 
 client = TestClient(app)
 
-
 def get_token_admin() -> str:
     login = {
         "username": "test_user",

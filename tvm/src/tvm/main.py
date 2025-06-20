@@ -3,13 +3,13 @@ import sys
 import warnings
 from fastapi import FastAPI
 
-from db import get_db
 from filter import filter_service
 from filter_input_util import input_filter
 
 from starlette.middleware.cors import CORSMiddleware
 
 from crew import Tvm
+
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
