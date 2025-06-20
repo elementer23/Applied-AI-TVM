@@ -152,7 +152,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=403, detail="Token is invalide of verlopen.")
 
 
-from main import app, get_db
+from main import app
 
 
 @app.post("/token", tags=["Authentication"])
