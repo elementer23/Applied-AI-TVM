@@ -3,10 +3,10 @@ from typing import Optional
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 Base = declarative_base()
-
 
 class User(Base):
     __tablename__ = "users"
@@ -24,7 +24,7 @@ class RefreshToken(Base):
     token = Column(String(255), unique=True, index=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
     expires_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
 
 
 class AdvisoryText(Base):
@@ -56,7 +56,7 @@ class Conversation(Base):
     __tablename__ = "conversations"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
 
     user = relationship("User", back_populates="conversations")
     messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
@@ -68,7 +68,7 @@ class Message(Base):
     conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False, index=True)
     content = Column(Text, nullable=False)
     is_user_message = Column(Boolean, nullable=False)  # True (1) if sent by user, False (0) if sent by AI
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
 
     conversation = relationship("Conversation", back_populates="messages")
 

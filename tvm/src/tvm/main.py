@@ -3,13 +3,13 @@ import sys
 import warnings
 from fastapi import FastAPI
 
-from db import get_db
 from filter import filter_service
 from filter_input_util import input_filter
 
 from starlette.middleware.cors import CORSMiddleware
 
 from crew import Tvm
+
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -62,7 +62,7 @@ def run(
 
     filtered_input = input_filter.filter_input(data.input)
     inputs = {
-        'input': filtered_input,
+        "input": filtered_input,
     }
 
     # Check if the input is insurance related using the filter service
@@ -91,7 +91,7 @@ def run(
     if not conversation:
         conversation = Conversation(
             user_id=current_user.id,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)
         )
         db.add(conversation)
         db.commit()
@@ -103,7 +103,7 @@ def run(
         conversation_id=conversation.id,
         content=data.input,
         is_user_message=True,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     db.add(user_message)
 
@@ -112,7 +112,7 @@ def run(
         conversation_id=conversation.id,
         content=ai_response,
         is_user_message=False,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     db.add(ai_message)
 
@@ -135,7 +135,7 @@ def train():
     """
     inputs = {
         "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
+        "current_year": str(datetime.now().year)
     }
     try:
         Tvm().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)

@@ -4,6 +4,7 @@ from .test_main import *
 from tvm.authentication import get_current_user
 from tvm.db import get_db
 
+
 # Get_current_user
 def test_get_current_user_success():
     token = get_token_admin()
@@ -13,7 +14,7 @@ def test_get_current_user_success():
     db = next(db_gen)
     try:
         current_user = asyncio.run(get_current_user(token, db))
-        assert current_user.username == user.json()['username']
+        assert current_user.username == user.json()["username"]
     finally:
         db_gen.close()
 

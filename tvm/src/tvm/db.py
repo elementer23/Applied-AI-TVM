@@ -5,14 +5,14 @@ import os
 from dotenv import load_dotenv
 import subprocess
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
 
+
 _original_init = mysql_loader_module.MySQLLoader.__init__
 load_dotenv()
-
 
 def patched_init(self, config):
     url = config.get("url")
@@ -130,18 +130,18 @@ def insert_base_data():
     db.add(new_advisorytext15)
     db.add(new_advisorytext16)
 
-    new_conversation1 = Conversation(user_id=1, created_at=datetime.utcnow() + timedelta(minutes=1))
-    new_conversation2 = Conversation(user_id=1, created_at=datetime.utcnow() + timedelta(minutes=2))
-    new_conversation3 = Conversation(user_id=2, created_at=datetime.utcnow() + timedelta(minutes=3))
-    new_conversation4 = Conversation(user_id=2, created_at=datetime.utcnow() + timedelta(minutes=4))
-    new_conversation5 = Conversation(user_id=1, created_at=datetime.utcnow() + timedelta(minutes=20))
+    new_conversation1 = Conversation(user_id=1, created_at=datetime.now(timezone.utc) + timedelta(minutes=1))
+    new_conversation2 = Conversation(user_id=1, created_at=datetime.now(timezone.utc) + timedelta(minutes=2))
+    new_conversation3 = Conversation(user_id=2, created_at=datetime.now(timezone.utc) + timedelta(minutes=3))
+    new_conversation4 = Conversation(user_id=2, created_at=datetime.now(timezone.utc) + timedelta(minutes=4))
+    new_conversation5 = Conversation(user_id=1, created_at=datetime.now(timezone.utc) + timedelta(minutes=20))
 
-    new_message1 = Message(conversation_id=1, content="First test message", is_user_message=True, created_at=datetime.utcnow() + timedelta(minutes=1))
-    new_message2 = Message(conversation_id=1, content="AI response", is_user_message=False, created_at=datetime.utcnow() + timedelta(minutes=2))
-    new_message3 = Message(conversation_id=2, content="Another test message", is_user_message=True, created_at=datetime.utcnow() + timedelta(minutes=3))
-    new_message4 = Message(conversation_id=2, content="Another AI response", is_user_message=False, created_at=datetime.utcnow() + timedelta(minutes=4))
-    new_message5 = Message(conversation_id=3, content="A test message without a response", is_user_message=True, created_at=datetime.utcnow() + timedelta(minutes=5))
-    new_message6 = Message(conversation_id=4, content="Another test message without a response", is_user_message=True, created_at=datetime.utcnow() + timedelta(minutes=6))
+    new_message1 = Message(conversation_id=1, content="First test message", is_user_message=True, created_at=datetime.now(timezone.utc) + timedelta(minutes=1))
+    new_message2 = Message(conversation_id=1, content="AI response", is_user_message=False, created_at=datetime.now(timezone.utc) + timedelta(minutes=2))
+    new_message3 = Message(conversation_id=2, content="Another test message", is_user_message=True, created_at=datetime.now(timezone.utc) + timedelta(minutes=3))
+    new_message4 = Message(conversation_id=2, content="Another AI response", is_user_message=False, created_at=datetime.now(timezone.utc) + timedelta(minutes=4))
+    new_message5 = Message(conversation_id=3, content="A test message without a response", is_user_message=True, created_at=datetime.now(timezone.utc) + timedelta(minutes=5))
+    new_message6 = Message(conversation_id=4, content="Another test message without a response", is_user_message=True, created_at=datetime.now(timezone.utc) + timedelta(minutes=6))
 
     db.add(new_conversation1)
     db.add(new_conversation2)

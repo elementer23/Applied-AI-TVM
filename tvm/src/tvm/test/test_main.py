@@ -1,11 +1,10 @@
 from fastapi.testclient import TestClient
-from tvm.db import reset_database, run_init_db, insert_base_data
+from tvm.db import reset_database, insert_base_data
 import pytest
 from tvm.main import app
 
 
 client = TestClient(app)
-
 
 def get_token_admin() -> str:
     login = {
