@@ -1,11 +1,9 @@
 from getpass import getpass
-
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
-
 from models import User
 
 

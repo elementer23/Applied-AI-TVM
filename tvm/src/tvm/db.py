@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import subprocess
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-
 from sqlalchemy.engine.url import make_url
 import embedchain.loaders.mysql as mysql_loader_module
 

@@ -1,8 +1,6 @@
 from typing import List
-
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from main import app
 from db import get_db
 from models import *
