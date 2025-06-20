@@ -6,7 +6,9 @@ from pydantic import BaseModel, Field
 
 
 class DatabaseQueryInput(BaseModel):
-    """Input schema for database query."""
+    """
+    Input schema for database query.
+    """
     category: str = Field(..., description="The category to search for")
     sub_category: str = Field(..., description="The sub_category to search for")
 
