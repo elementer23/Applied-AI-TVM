@@ -1,54 +1,110 @@
-# Tvm Crew
 
-Welcome to the Tvm Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+# TVM AI
+This project contains a multi-agent AI system powered by [CrewAI](https://docs.crewai.com/introduction) and [FastAPI](https://fastapi.tiangolo.com/). The goal of this project is to rewrite texts using AI with the help of templates and make this accessible using an API.
 
 ## Installation
+Ensure you have Python >=3.10 <3.13 installed on your system, any other version will result in unexpected errors. This project uses UV for dependency management and package handling, offering a seamless setup and execution experience.
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
-
+### Installing UV
 First, if you haven't already, install uv:
 
+**On windows:**
 ```bash
-pip install uv
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex
 ```
 
-Next, navigate to your project directory and install the dependencies:
+**On MacOS/Linux:**
 
-(Optional) Lock the dependencies and install them by using the CLI command:
+Using curl
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+Alternatively using wget
+```bash
+wget -qO- https://astral.sh/uv/install.sh | sh
+```
+
+If you run into any issues, refer to [UV's installation guide](https://docs.astral.sh/uv/getting-started/installation/) for more information.
+
+### Installing CrewAI
+Run the following command to install CrewAI
+```bash
+uv tool install crewai
+```
+
+If you encounter a PATH warning, run this command to update your shell:
+```bash
+uv tool update-shell
+```
+
+If you encounter the chroma-hnswlib==0.7.6 build error (fatal error C1083: Cannot open include file: 'float.h') on Windows, install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/) with Desktop development with C++.
+
+To verify that crewai is installed, run:
+```bash
+uv tool list
+```
+
+You should see something like:
+```
+crewai v0.102.0
+- crewai
+```
+
+#### Updating
+If you need to update crewai, run:
+```bash
+uv tool install crewai --upgrade
+```
+
+### Installing dependencies
+This project uses UV for dependency management. To set up a venv and install all dependencies run:
 ```bash
 crewai install
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+## MySQL Database
+This application requires a MySQL database to function. Furthermore, it is required to use InnoDB as the engine. The connection string of the database needs to be specified in the .env file. The tables will be automatically created when the application is started.
 
-- Modify `src/tvm/config/agents.yaml` to define your agents
-- Modify `src/tvm/config/tasks.yaml` to define your tasks
-- Modify `src/tvm/crew.py` to add your own logic, tools and specific args
-- Modify `src/tvm/main.py` to add custom inputs for your agents and tasks
+## Setup environment variables
+This projects includes a .env.dist, this document includes examples of possible entries. Create a file called '.env' At a minimum, an LLM must be specified, a random secret value added, the allowed origins set, and a database connection string provided.
 
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
+## Run the application
+First activate the venv by running:
 ```bash
-$ crewai run
+.venv\Scripts\activate
 ```
 
-This command initializes the TVM Crew, assembling the agents and assigning them tasks as defined in your configuration.
+To start the application run:
+```bash
+cd src/tvm
+```
+```bash
+uvicorn main:app
+```
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+## Create admin account
+Before you can make an admin account, make sure the application has been started at least once and the tables in the database are created. To then create an account run the following command from the src/tvm folder:
+```bash
+python init_admin.py
+```
 
-## Understanding Your Crew
+## Initialize database categories and texts
+When the database is first created it is completely empty. To quickly import the predefined categories and texts run the following command from the src/tvm folder:
+```bash
+python init_db.py
+```
 
-The TVM Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+## Unit Testing
+For the unit tests, pytest is required to be used.
+You should create a new variant of the "tvm"-database and connect to this database through the connection string in the .env-file. This is to prevent the unit tests from messing with the data used in the actual application.
+The creation of a new database needs to be done manually, which is easiest through a service like *phpmyadmin*.
 
-## Support
+By typing the following command in the src/tvm folder, it will set up the database and run the unit tests:
+```bash
+pytest
+```
 
-For support, questions, or feedback regarding the Tvm Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.
+In case running "pytest" gives an error, you can alternatively run the following command:
+```bash
+uv run pytest
+```

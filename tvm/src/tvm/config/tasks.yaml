@@ -1,17 +1,34 @@
-research_task:
+retrieve_template:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Op basis van het uitgevoerde onderzoek, haal de juiste template op uit de database en vul dit in.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Geef een ingevuld template terug zonder gaten.
+  agent: writer
 
-reporting_task:
+research:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Lees de gehele input. Haal hier alle benodigde data voor de writer uit. Kijk naar {input}
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    Inventaris
+    Welk soort advies
+    Eigen risico
+    Verzekerd bedrag
+    Advies wordt opgevolgd
+    Reden dat advies niet wordt opgevolgd indien van toepassing
+    Overige context
+  agent: reader
+
+fetch_template_from_db:
+  description: >
+    Retrieve the actual advisory text template from the database.
+    
+    CRITICAL: Return the TEXT CONTENT, not SQL statements.
+    
+    Steps:
+    1. Use the category and subcategory identified in previous task
+    2. Query the database for matching advisory text
+    3. Return the complete text from the 'text' column
+    
+    Do not return SQL queries - return the actual advisory text content.
+  expected_output: >
+    The complete Dutch advisory text template from the database.
