@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import secrets
 from models import User, RefreshToken, RefreshTokenRequest, UserResponse, UserUpdateRequest
@@ -38,14 +38,14 @@ def authenticate_user(db: Session, username: str, password: str):
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire, "type": "access"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def cleanup_expired_tokens(db: Session):
     # Remove all expired refresh tokens from database
-    current_time = datetime.utcnow()
+    current_time = datetime.now(timezone.utc)
     deleted_count = db.query(RefreshToken).filter(
         RefreshToken.expires_at < current_time
     ).delete()
@@ -59,7 +59,7 @@ def create_refresh_token(db: Session, user_id: int):
 
     # Generate a secure random token
     token = secrets.token_urlsafe(32)
-    expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
     # Delete old refresh tokens for this user (complete removal)
     db.query(RefreshToken).filter(
@@ -85,7 +85,7 @@ def verify_refresh_token(db: Session, token: str):
     # Look for token in DB
     refresh_token = db.query(RefreshToken).filter(
         RefreshToken.token == token,
-        RefreshToken.expires_at > datetime.utcnow()
+        RefreshToken.expires_at > datetime.now(timezone.utc)
     ).first()
 
     # Token not found in DB

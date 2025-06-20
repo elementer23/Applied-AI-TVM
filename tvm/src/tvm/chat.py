@@ -93,7 +93,7 @@ async def create_conversation(
     """
     new_conversation = Conversation(
         user_id=current_user.id,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
 
     db.add(new_conversation)

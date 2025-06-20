@@ -91,7 +91,7 @@ def run(
     if not conversation:
         conversation = Conversation(
             user_id=current_user.id,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)
         )
         db.add(conversation)
         db.commit()
@@ -103,7 +103,7 @@ def run(
         conversation_id=conversation.id,
         content=data.input,
         is_user_message=True,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     db.add(user_message)
 
@@ -112,7 +112,7 @@ def run(
         conversation_id=conversation.id,
         content=ai_response,
         is_user_message=False,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     db.add(ai_message)
 
