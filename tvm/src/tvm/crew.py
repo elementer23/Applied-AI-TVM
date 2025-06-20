@@ -10,7 +10,9 @@ from tools.db_multiple_text_tool import multi_advisory_db_tool
 
 @CrewBase
 class Tvm():
-    """Tvm crew"""
+    """
+    Tvm crew
+    """
 
     OPEN_API_BASE = os.environ.get("OPENAI_API_BASE")
     OPEN_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -43,7 +45,7 @@ class Tvm():
     @agent
     def reader(self) -> Agent:
         return Agent(
-            config=self.agents_config['reader'],
+            config=self.agents_config["reader"],
             verbose=True,
             llm=self.reasoning_llm(),
             tools=[category_tool],
@@ -53,7 +55,7 @@ class Tvm():
     @agent
     def writer(self) -> Agent:
         return Agent(
-            config=self.agents_config['writer'],
+            config=self.agents_config["writer"],
             verbose=True,
             llm=self.reasoning_llm(),
         )
@@ -61,7 +63,9 @@ class Tvm():
 
     @agent
     def db_specialist(self) -> Agent:
-        """Gespecialiseerde agent voor database operaties"""
+        """
+        Gespecialiseerde agent voor database operaties
+        """
         return Agent(
             role="Database Specialist",
             goal="Retrieve exact advisory text templates from the advisory_texts table using category and sub_category fields",
@@ -80,7 +84,7 @@ class Tvm():
 
     def manager(self) -> Agent:
         return Agent(
-            config=self.agents_config['manager'],
+            config=self.agents_config["manager"],
             verbose=True,
             allow_delegation=True,
             llm=self.reasoning_llm()
@@ -89,7 +93,9 @@ class Tvm():
 
     @task
     def get_available_categories(self) -> Task:
-        """Simple task to get all available categories and subcategories"""
+        """
+        Simple task to get all available categories and subcategories
+        """
         return Task(
             description="""
                 Use the Category Tool to get all available categories and subcategories from the database.
@@ -174,7 +180,9 @@ class Tvm():
 
     @task
     def analyze_template_requirements(self) -> Task:
-        """Analyze the template for missing options and placeholders that cannot be determined"""
+        """
+        Analyze the template for missing options and placeholders that cannot be determined
+        """
         return Task(
             description="""
                 Analyze the retrieved template to identify any placeholders or choice options that cannot be clearly determined from: {input}
@@ -284,7 +292,9 @@ class Tvm():
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Tvm crew"""
+        """
+        Creates the Tvm crew
+        """
         return Crew(
             agents=self.agents,
             tasks=self.tasks,

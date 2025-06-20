@@ -62,7 +62,7 @@ def run(
 
     filtered_input = input_filter.filter_input(data.input)
     inputs = {
-        'input': filtered_input,
+        "input": filtered_input,
     }
 
     # Check if the input is insurance related using the filter service
@@ -135,7 +135,7 @@ def train():
     """
     inputs = {
         "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
+        "current_year": str(datetime.now().year)
     }
     try:
         Tvm().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)

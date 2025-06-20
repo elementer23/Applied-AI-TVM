@@ -3,7 +3,9 @@ import os
 
 
 class InsuranceFilterService:
-    """Simple service to filter queries for insurance-related content using AI"""
+    """
+    Simple service to filter queries for insurance-related content using AI
+    """
 
     OPEN_API_BASE = os.environ.get("OPENAI_API_BASE")
     OPEN_API_KEY = os.environ.get("OPENAI_API_KEY")
