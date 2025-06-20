@@ -3,6 +3,7 @@ import sys
 import warnings
 from fastapi import FastAPI
 
+from db import get_db
 from filter import filter_service
 from filter_input_util import input_filter
 
