@@ -8,7 +8,6 @@ from filter_input_util import input_filter
 from starlette.middleware.cors import CORSMiddleware
 from crew import Tvm
 
-
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 tags_metadata = [
@@ -28,7 +27,7 @@ tags_metadata = [
 
 app = FastAPI(openapi_tags=tags_metadata,
               title="TVM AI",
-              version="0.0.1",)
+              version="0.0.1", )
 
 from authentication import *
 from chat import *
@@ -41,6 +40,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_headers=["*"],
 )
+
 
 @app.post("/run", tags=["Chat"])
 def run(

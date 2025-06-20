@@ -20,4 +20,5 @@ class FilterInputUtility:
 
         return input
 
+
 input_filter = FilterInputUtility()

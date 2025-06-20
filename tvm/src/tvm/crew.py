@@ -21,7 +21,6 @@ class Tvm():
     agents: List[BaseAgent]
     tasks: List[Task]
 
-
     @llm
     def default_crew_llm(self) -> LLM:
         return LLM(
@@ -30,7 +29,6 @@ class Tvm():
             api_base=self.OPEN_API_BASE,
             api_key=self.OPEN_API_KEY
         )
-
 
     @llm
     def reasoning_llm(self) -> LLM:
@@ -41,7 +39,6 @@ class Tvm():
             api_key=self.OPEN_API_KEY
         )
 
-
     @agent
     def reader(self) -> Agent:
         return Agent(
@@ -51,7 +48,6 @@ class Tvm():
             tools=[category_tool],
         )
 
-
     @agent
     def writer(self) -> Agent:
         return Agent(
@@ -59,7 +55,6 @@ class Tvm():
             verbose=True,
             llm=self.reasoning_llm(),
         )
-
 
     @agent
     def db_specialist(self) -> Agent:
@@ -78,9 +73,8 @@ class Tvm():
             You always retrieve the actual text content from the database, never SQL statements. You understand this table structure perfectly.""",
             verbose=True,
             llm=self.default_crew_llm(),
-            tools=[advisory_db_tool,multi_advisory_db_tool],
+            tools=[advisory_db_tool, multi_advisory_db_tool],
         )
-
 
     def manager(self) -> Agent:
         return Agent(
@@ -89,7 +83,6 @@ class Tvm():
             allow_delegation=True,
             llm=self.reasoning_llm()
         )
-
 
     @task
     def get_available_categories(self) -> Task:
@@ -107,7 +100,6 @@ class Tvm():
             agent=self.reader()
         )
 
-
     @task
     def research(self) -> Task:
         return Task(
@@ -122,7 +114,6 @@ class Tvm():
             agent=self.reader(),
             context=[self.get_available_categories()]
         )
-
 
     @task
     def decide_template_category(self) -> Task:
@@ -151,7 +142,6 @@ class Tvm():
             context=[self.research(), self.get_available_categories()]
         )
 
-
     @task
     def fetch_template_from_db(self) -> Task:
         return Task(
@@ -176,7 +166,6 @@ class Tvm():
             agent=self.db_specialist(),
             context=[self.decide_template_category()]
         )
-
 
     @task
     def analyze_template_requirements(self) -> Task:
@@ -237,7 +226,6 @@ class Tvm():
             context=[self.research(), self.fetch_template_from_db()]
         )
 
-
     @task
     def fill_in_template(self) -> Task:
         return Task(
@@ -286,9 +274,9 @@ class Tvm():
                 """,
             expected_output="Een Nederlands adviessjabloon waarbij alleen expliciete informatie is ingevuld en onduidelijke template keuzes zijn gemarkeerd als [ONTBREEKT: ...] met onderaan een overzicht van wat nog bepaald moet worden.",
             agent=self.writer(),
-            context=[self.research(),self.get_available_categories(), self.fetch_template_from_db(), self.analyze_template_requirements()]
+            context=[self.research(), self.get_available_categories(), self.fetch_template_from_db(),
+                     self.analyze_template_requirements()]
         )
-
 
     @crew
     def crew(self) -> Crew:

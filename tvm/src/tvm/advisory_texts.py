@@ -75,7 +75,7 @@ def update_category(
         if not category:
             raise HTTPException(status_code=404, detail="Categorie niet gevonden.")
         old_category_name = category.name
-        category.name  = category_update.name
+        category.name = category_update.name
 
         db.query(AdvisoryText).filter(AdvisoryText.category == old_category_name).update({"category": category.name})
         db.commit()
@@ -207,7 +207,8 @@ def create_text(
             raise HTTPException(status_code=400, detail="De gegeven tekst bestaat al.")
         if sub_category:
             raise HTTPException(status_code=400, detail="De gegeven subcategorie bestaat al voor deze categorie.")
-        new_advice = AdvisoryText(text=advisory_text_create.text, category=category.name, sub_category=advisory_text_create.sub_category)
+        new_advice = AdvisoryText(text=advisory_text_create.text, category=category.name,
+                                  sub_category=advisory_text_create.sub_category)
         new_subcategory = SubCategory(name=advisory_text_create.sub_category, category_id=category.id)
         db.add(new_advice)
         db.add(new_subcategory)

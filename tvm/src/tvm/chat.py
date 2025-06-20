@@ -9,8 +9,8 @@ from authentication import get_current_user
 
 @app.get("/conversations", response_model=List[ConversationResponse], tags=["Chat"])
 async def get_user_conversations(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
 ):
     """
     Returns all conversations of user

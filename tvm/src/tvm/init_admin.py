@@ -6,13 +6,13 @@ from sqlalchemy.orm import sessionmaker
 import os
 from models import User
 
-
 load_dotenv(dotenv_path="../../.env")
 SQLALCHEMY_DATABASE_URL = os.getenv("SQL_CONNECTION")
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def create_admin():
     db = SessionLocal()
