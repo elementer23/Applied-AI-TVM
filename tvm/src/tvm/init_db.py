@@ -5,9 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
 
-
-# uses knowledge/templates.json to seed the database with data in absence of a front-end.
-
 load_dotenv(dotenv_path="../../.env")
 engine = create_engine(os.getenv("SQL_CONNECTION"))
 Session = sessionmaker(bind=engine)

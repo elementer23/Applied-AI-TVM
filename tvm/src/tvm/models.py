@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
-
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = "users"
@@ -137,7 +137,7 @@ class SubCategoryResponse(BaseModel):
 class SubCategoryModel(BaseModel):
     name: str
 
-      
+
 class UserUpdateRequest(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
@@ -151,4 +151,3 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
-

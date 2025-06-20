@@ -11,9 +11,6 @@
 		},
 		{
 			"name": "damage_to_passengers"
-		},
-		{
-			"name": "juridical_claims"
 		}
 	],
 	"subcategories": [
@@ -110,11 +107,6 @@
 			"category": "damage_to_passengers",
 			"sub_category": "identify_by_risk",
 			"text": "Tijdens de inventarisatie hebben wij vastgesteld dat wij per risico in kaart brengen hoeveel risico u wilt en kunt dragen. U heeft aangegeven dat uw verzekeringsbeleid is om [beleid_klant]. Dit kunt en wilt u dragen. Mijn advies is om (geen SVI dekking af te sluiten./ een SVI dekking af te sluiten. Voor het verzekerde bedrag en het eigen risico verwijs ik u naar de polis.) U geeft aan dat u [volg_advies_op]"
-		},
-		{
-			"category": "juridical_claims",
-			"sub_category": "minrisk",
-			"text": "Tijdens de inventarisatie hebben wij vastgesteld dat u alle risico's tot een minimum wenst te beperken. Mijn advies is om een rechtsbijstandverzekering af te sluiten. Voor het verzekerde bedrag, gebaseerd op [verzekerd_bedrag] en het (eigen risico van [eigen_risico]./standaard eigen risico.) Deze bedragen vindt u terug op de polis.  U geeft aan dat u [volgt_advies_op]"
 		}
 	]
 }

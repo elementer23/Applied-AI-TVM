@@ -10,7 +10,6 @@ import secrets
 from models import User, RefreshToken, RefreshTokenRequest, UserResponse, UserUpdateRequest
 from db import get_db
 
-
 SECRET_KEY = os.environ.get("SECRET")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -18,6 +17,7 @@ REFRESH_TOKEN_EXPIRE_DAYS = 1
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
